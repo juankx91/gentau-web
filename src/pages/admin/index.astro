@@ -1,0 +1,202 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getProducts, getSlides, getSetting, getMessages } from '../../lib/db';
+import { optimize } from '../../lib/cloudinary';
+
+const [products, slides, videoUrl, messages] = await Promise.all([
+  getProducts(), getSlides(), getSetting('hero_video'), getMessages(),
+]);
+---
+<Layout title="Administración" bare>
+  <header class="admin-bar">
+    <div class="wrap">
+      <span class="logo">GENTAU · Admin</span>
+      <nav>
+        <a href="/" target="_blank">Ver sitio</a>
+        <form method="POST" action="/api/logout"><button class="btn btn-outline btn-sm" type="submit">Cerrar sesión</button></form>
+      </nav>
+    </div>
+  </header>
+
+  <div class="wrap section">
+    <!-- VIDEO DEL HERO -->
+    <section class="panel" id="video">
+      <h2>Video del inicio</h2>
+      <p class="hint">Se muestra de fondo en la portada. Recomendado: MP4 corto (10–20 s), horizontal y liviano.</p>
+      {videoUrl
+        ? <video class="video-preview" src={optimize(videoUrl)} controls muted playsinline></video>
+        : <p class="empty">Aún no hay video. La portada usa el fondo verde.</p>}
+      <form id="hero-form" class="row">
+        <input type="file" id="hero-file" accept="video/*" required />
+        <button class="btn btn-green btn-sm" type="submit">Subir video</button>
+        {videoUrl && <button class="btn btn-danger btn-sm" type="button" id="hero-remove">Quitar video</button>}
+      </form>
+      <p id="hero-status" class="status" role="status"></p>
+    </section>
+
+    <!-- CARRUSEL -->
+    <section class="panel" id="carrusel">
+      <h2>Carrusel del inicio</h2>
+      <p class="hint">Estas imágenes giran solas en la portada. Para cambiar una, elimínala y sube la nueva.</p>
+      <form id="carousel-form" class="row">
+        <input type="file" id="carousel-files" accept="image/*" multiple required />
+        <button class="btn btn-green btn-sm" type="submit">Agregar imágenes</button>
+      </form>
+      <p id="carousel-status" class="status" role="status"></p>
+      {slides.length === 0 ? <p class="empty">No hay imágenes en el carrusel.</p> : (
+        <div class="thumbs">
+          {slides.map((s) => (
+            <div class="thumb">
+              <img src={optimize(s.image_url, 'f_auto,q_auto,c_fill,w_300,h_375')} alt="" />
+              <div class="row"><button class="btn btn-danger btn-sm" data-delete="carousel" data-id={s.id}>Eliminar</button></div>
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+
+    <!-- PRODUCTOS -->
+    <section class="panel" id="productos">
+      <h2 id="product-form-title">Agregar producto</h2>
+      <form id="product-form">
+        <input type="hidden" id="product-id" />
+        <div class="field"><label for="product-name">Nombre</label><input id="product-name" required maxlength="120" /></div>
+        <div class="field"><label for="product-desc">Descripción</label><textarea id="product-desc" maxlength="1000"></textarea></div>
+        <div class="field"><label for="product-image">Imagen <span id="image-hint"></span></label><input type="file" id="product-image" accept="image/*" /></div>
+        <div class="row">
+          <button class="btn btn-green" type="submit" id="product-submit">Guardar producto</button>
+          <button class="btn btn-danger" type="button" id="product-cancel" hidden>Cancelar edición</button>
+        </div>
+        <p id="product-status" class="status" role="status"></p>
+      </form>
+
+      <h2 style="margin-top:2rem">Productos publicados ({products.length})</h2>
+      {products.length === 0 && <p class="empty">Aún no has agregado productos.</p>}
+      {products.map((p) => (
+        <div class="item">
+          {p.image_url ? <img src={optimize(p.image_url, 'f_auto,q_auto,c_fill,w_128,h_160')} alt="" /> : <img alt="" />}
+          <div class="grow"><strong>{p.name}</strong><p>{p.description}</p></div>
+          <button class="btn btn-outline btn-sm" style="color:var(--green-900);border-color:var(--green-700)" data-edit data-id={p.id} data-name={p.name} data-desc={p.description}>Editar</button>
+          <button class="btn btn-danger btn-sm" data-delete="products" data-id={p.id}>Eliminar</button>
+        </div>
+      ))}
+    </section>
+
+    <!-- MENSAJES -->
+    <section class="panel" id="mensajes">
+      <h2>Mensajes de contacto ({messages.length})</h2>
+      {messages.length === 0 && <p class="empty">No hay mensajes todavía.</p>}
+      {messages.map((m) => (
+        <div class="item">
+          <div class="grow" style="white-space:normal">
+            <strong>{m.name}</strong> · <a href={`mailto:${m.email}`}>{m.email}</a>
+            <small> · {new Date(m.created_at.replace(' ', 'T') + 'Z').toLocaleString('es-CO')}</small>
+            <p style="white-space:pre-line">{m.message}</p>
+          </div>
+          <button class="btn btn-danger btn-sm" data-delete="messages" data-id={m.id}>Eliminar</button>
+        </div>
+      ))}
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const $ = (id: string) => document.getElementById(id) as any;
+
+  async function api(url: string, method: string, body?: unknown) {
+    const r = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || 'Ocurrió un error');
+    return d;
+  }
+
+  // Sube un archivo directo a Cloudinary con una firma que entrega nuestro servidor.
+  async function upload(file: File, type: 'image' | 'video'): Promise<string> {
+    const s = await api(`/api/admin/sign`, 'GET');
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('api_key', s.apiKey);
+    fd.append('timestamp', s.timestamp);
+    fd.append('signature', s.signature);
+    fd.append('folder', s.folder);
+    const r = await fetch(`https://api.cloudinary.com/v1_1/${s.cloudName}/${type}/upload`, { method: 'POST', body: fd });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || 'No se pudo subir el archivo');
+    return d.secure_url;
+  }
+
+  function say(id: string, msg: string, error = false) {
+    const el = $(id);
+    el.className = 'status' + (error ? ' error' : ' ok');
+    el.textContent = msg;
+  }
+
+  async function run(statusId: string, work: () => Promise<void>, doing: string) {
+    say(statusId, doing);
+    try { await work(); location.reload(); }
+    catch (e) { say(statusId, (e as Error).message, true); }
+  }
+
+  // Video del hero
+  $('hero-form').addEventListener('submit', (e: Event) => {
+    e.preventDefault();
+    run('hero-status', async () => {
+      const url = await upload($('hero-file').files[0], 'video');
+      await api('/api/admin/hero', 'POST', { videoUrl: url });
+    }, 'Subiendo video, puede tardar un poco...');
+  });
+  $('hero-remove')?.addEventListener('click', () => {
+    if (confirm('¿Quitar el video del inicio?')) run('hero-status', () => api('/api/admin/hero', 'POST', { videoUrl: '' }), 'Quitando...');
+  });
+
+  // Carrusel
+  $('carousel-form').addEventListener('submit', (e: Event) => {
+    e.preventDefault();
+    run('carousel-status', async () => {
+      const urls: string[] = [];
+      for (const f of Array.from($('carousel-files').files as FileList)) urls.push(await upload(f, 'image'));
+      await api('/api/admin/carousel', 'POST', { imageUrls: urls });
+    }, 'Subiendo imágenes...');
+  });
+
+  // Productos: crear o editar
+  $('product-form').addEventListener('submit', (e: Event) => {
+    e.preventDefault();
+    run('product-status', async () => {
+      const id = $('product-id').value;
+      const file = $('product-image').files[0];
+      const imageUrl = file ? await upload(file, 'image') : '';
+      const body = { id, name: $('product-name').value, description: $('product-desc').value, imageUrl };
+      await api('/api/admin/products', id ? 'PUT' : 'POST', body);
+    }, 'Guardando...');
+  });
+
+  document.querySelectorAll('[data-edit]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const el = btn as HTMLElement;
+      $('product-id').value = el.dataset.id;
+      $('product-name').value = el.dataset.name;
+      $('product-desc').value = el.dataset.desc;
+      $('product-form-title').textContent = 'Editar producto';
+      $('product-submit').textContent = 'Guardar cambios';
+      $('image-hint').textContent = '(opcional: solo si quieres cambiarla)';
+      $('product-cancel').hidden = false;
+      $('productos').scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+  $('product-cancel').addEventListener('click', () => location.reload());
+
+  // Eliminar (productos, carrusel, mensajes)
+  document.querySelectorAll('[data-delete]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const el = btn as HTMLElement;
+      if (!confirm('¿Seguro que quieres eliminarlo?')) return;
+      try { await api(`/api/admin/${el.dataset.delete}`, 'DELETE', { id: Number(el.dataset.id) }); location.reload(); }
+      catch (e) { alert((e as Error).message); }
+    });
+  });
+</script>

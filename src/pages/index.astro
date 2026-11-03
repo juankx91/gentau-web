@@ -1,0 +1,80 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Carousel from '../components/Carousel.astro';
+import { getSlides, getSetting } from '../lib/db';
+import { optimize } from '../lib/cloudinary';
+
+const [slides, videoUrl] = await Promise.all([getSlides(), getSetting('hero_video')]);
+const poster = videoUrl ? optimize(videoUrl, 'so_0,q_auto').replace(/\.\w+$/, '.jpg') : undefined;
+const phrase = ['Moda sin barreras', 'Diseño propio', 'Impacto real'];
+const band = Array.from({ length: 8 }, () => phrase.join(' ✦ ') + ' ✦ ');
+const pillars = [
+  ['Diseño propio', 'Una identidad visual auténtica, sin copiar las tendencias masivas.'],
+  ['Tallas reales', 'Patronaje adaptado a la diversidad de cuerpos, edades y siluetas.'],
+  ['Impacto social', 'Empleo digno para personas de bajos recursos y madres cabeza de hogar.'],
+];
+---
+<Layout>
+  <section class={`hero ${videoUrl ? 'has-video' : ''}`}>
+    <div class="hero-bg" aria-hidden="true"><i></i><i></i><i></i></div>
+    {videoUrl && (
+      <video autoplay muted loop playsinline preload="metadata" poster={poster}>
+        <source src={optimize(videoUrl, 'f_auto,q_auto')} />
+      </video>
+    )}
+
+    <div class="wrap">
+      <h1>
+        <span class="ln" style="--i:1"><span>Moda sin</span></span>
+        <span class="ln" style="--i:2"><span>barreras.</span></span>
+        <em>Diseño propio. Impacto real.</em>
+      </h1>
+      <p>Ropa femenina y masculina hecha en Colombia, pensada para todos los cuerpos y creada para abrir oportunidades.</p>
+      <div class="actions">
+        <a class="btn btn-gold" href="/productos">Ver productos</a>
+        <a class="btn btn-outline" href="/contacto">Contáctanos</a>
+      </div>
+    </div>
+
+    <svg class="seal" viewBox="0 0 200 200" aria-hidden="true">
+      <defs><path id="circ" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0" /></defs>
+      <g class="ring"><text><textPath href="#circ">MODA SIN BARRERAS · DISEÑO PROPIO · IMPACTO REAL ·</textPath></text></g>
+      <circle cx="100" cy="100" r="50" fill="none" stroke="#e8ce73" stroke-width="1.2" stroke-dasharray="5 5" />
+      <text class="g" x="100" y="120" text-anchor="middle">G</text>
+    </svg>
+
+    <svg class="stitch" viewBox="0 0 1440 220" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+      <defs>
+        <mask id="draw" maskUnits="userSpaceOnUse" x="0" y="0" width="1440" height="220">
+          <path class="m" pathLength="1" d="M-20 150 C 240 40 420 230 700 130 S 1150 20 1460 110" />
+        </mask>
+      </defs>
+      <path class="d" mask="url(#draw)" d="M-20 150 C 240 40 420 230 700 130 S 1150 20 1460 110" />
+    </svg>
+  </section>
+
+  <div class="band" aria-hidden="true">
+    <div class="band-track">
+      <span>{band.join('')}</span><span>{band.join('')}</span>
+    </div>
+  </div>
+
+  <Carousel images={slides.map((s) => s.image_url)} />
+
+  <section class="section">
+    <div class="wrap about">
+      <div class="reveal">
+        <h2 class="section-title">Una marca hecha para todos los cuerpos</h2>
+        <p class="lead">GENTAU nació entre dos amigas de universidad que no encontraban prendas que se ajustaran a su cuerpo y a su estilo. Hoy diseñamos y confeccionamos con calidad colombiana.</p>
+      </div>
+      <div>
+        {pillars.map(([title, text], i) => (
+          <div class="pillar reveal" style={`--i:${i}`}>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>

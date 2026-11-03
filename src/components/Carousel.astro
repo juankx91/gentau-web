@@ -1,0 +1,23 @@
+---
+import { optimize } from '../lib/cloudinary';
+interface Props { images: string[] }
+const { images } = Astro.props;
+
+// Repetimos las imágenes hasta tener suficientes y las duplicamos para que el giro sea continuo.
+let base = [...images];
+while (base.length > 0 && base.length < 8) base = [...base, ...images];
+const track = [...base, ...base];
+---
+{images.length > 0 && (
+  <section class="carousel" aria-label="Galería de prendas">
+    <div class="vp">
+      <div class="carousel-track" style={`--dur:${base.length * 7}s`}>
+        {track.map((src) => (
+          <figure class="shot" style="margin:0">
+            <img src={optimize(src, 'f_auto,q_auto,c_fill,w_700,h_875')} alt="Prenda GENTAU" loading="lazy" />
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+)}

@@ -1,0 +1,63 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+import { SITE } from '../config';
+
+interface Props { title?: string; description?: string; bare?: boolean }
+const { title, description = SITE.slogan, bare = false } = Astro.props;
+const fullTitle = title ? `${title} | ${SITE.name}` : `${SITE.name} · Moda inclusiva`;
+const favicon = `data:image/svg+xml,${encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='#0b3d2e'/><text x='32' y='46' font-size='40' text-anchor='middle' fill='#e8ce73' font-family='Georgia' font-style='italic'>G</text></svg>")}`;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={favicon} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@400;500&display=swap" rel="stylesheet" />
+    <script is:inline>document.documentElement.classList.add('js')</script>
+  </head>
+  <body>
+    {!bare && <Header />}
+    <main><slot /></main>
+    {!bare && <Footer />}
+  </body>
+</html>
+
+<script>
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Aparición suave al hacer scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // Foco de luz dorada que sigue al mouse en la portada
+  const hero = document.querySelector('.hero') as HTMLElement | null;
+  hero?.addEventListener('pointermove', (e) => {
+    const r = hero.getBoundingClientRect();
+    hero.style.setProperty('--mx', `${e.clientX - r.left}px`);
+    hero.style.setProperty('--my', `${e.clientY - r.top}px`);
+  });
+
+  // Tarjetas 3D que se inclinan hacia el mouse
+  if (!reduce && matchMedia('(pointer: fine)').matches) {
+    document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
+      card.addEventListener('pointermove', (e) => {
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        card.style.transform = `rotateY(${(x - 0.5) * 12}deg) rotateX(${(0.5 - y) * 12}deg) translateZ(0)`;
+        card.style.setProperty('--px', `${x * 100}%`);
+        card.style.setProperty('--py', `${y * 100}%`);
+      });
+      card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+    });
+  }
+</script>
