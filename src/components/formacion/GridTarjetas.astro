@@ -1,0 +1,77 @@
+---
+// Sección genérica de tarjetas con ícono.
+// Se reutiliza en: Capacitación/Formación/Desarrollo, Tipos de aprendizaje,
+// Principios del modelo, Cultura de GENTAU y Resultados esperados.
+import Encabezado from '../Encabezado.astro';
+import Icono from '../Icono.astro';
+
+interface Tarjeta { titulo: string; icono: string; texto?: string; ejemplo?: string }
+interface Props {
+  id?: string;
+  etiqueta?: string;
+  titulo: string;
+  texto?: string;
+  tarjetas: Tarjeta[];
+  /** Fondo de la sección */
+  fondo?: 'crema' | 'blanca' | 'menta' | 'verde';
+  /** Ancho mínimo de cada tarjeta antes de pasar a otra fila */
+  anchoMinimo?: string;
+  /** Muestra el número de cada tarjeta (01, 02…) */
+  numerar?: boolean;
+}
+const { id, etiqueta, titulo, texto, tarjetas, fondo = 'crema', anchoMinimo = '260px', numerar = false } = Astro.props;
+const oscuro = fondo === 'verde';
+---
+<section id={id} class:list={['seccion', { 'seccion--blanca': fondo === 'blanca', 'seccion--menta': fondo === 'menta', 'seccion--verde': oscuro }]}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} texto={texto} />
+    <div class="f-grid" style={`--ancho-minimo: ${anchoMinimo}`}>
+      {tarjetas.map((t, i) => (
+        <article class:list={['tarjeta', 'f-tarjeta', 'aparecer', { 'tarjeta--verde': oscuro }]}>
+          <div class="f-tarjeta__cabeza">
+            <span class="icono-circulo"><Icono nombre={t.icono} /></span>
+            {numerar && <span class="f-tarjeta__numero" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>}
+          </div>
+          <h3>{t.titulo}</h3>
+          {t.texto && <p>{t.texto}</p>}
+          {t.ejemplo && (
+            <p class="f-tarjeta__ejemplo"><strong>Ejemplo:</strong> {t.ejemplo}</p>
+          )}
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .f-grid {
+    display: grid;
+    gap: var(--formacion-espacio-grid);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--ancho-minimo)), 1fr));
+  }
+  .f-tarjeta {
+    display: flex;
+    flex-direction: column;
+    padding: var(--formacion-espacio-tarjeta);
+  }
+  .f-tarjeta__cabeza { display: flex; align-items: flex-start; justify-content: space-between; }
+  .f-tarjeta__numero {
+    font-family: var(--fuente-titulos);
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--dorado);
+    opacity: 0.8;
+  }
+  .f-tarjeta__ejemplo {
+    margin-top: auto;
+    padding: 0.8rem 1rem;
+    border-left: 3px solid var(--dorado);
+    border-radius: 0 calc(var(--radio) / 2) calc(var(--radio) / 2) 0;
+    background: var(--menta);
+    font-size: var(--tam-pequeno) !important;
+  }
+  .f-tarjeta p + .f-tarjeta__ejemplo { margin-top: 1rem; }
+  .f-tarjeta__ejemplo strong { color: var(--verde-oscuro); }
+  .tarjeta--verde .f-tarjeta__ejemplo { background: rgba(255, 255, 255, 0.07); }
+  .tarjeta--verde .f-tarjeta__ejemplo strong { color: var(--dorado-claro); }
+</style>

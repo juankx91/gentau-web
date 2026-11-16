@@ -1,0 +1,104 @@
+---
+// 10) Fases del modelo: ciclo anual de 4 pasos
+import Encabezado from '../Encabezado.astro';
+import Icono from '../Icono.astro';
+
+interface Paso { titulo: string; subtitulo: string; icono: string; texto: string }
+interface Props { id?: string; etiqueta?: string; titulo: string; notaCiclo?: string; pasos: Paso[] }
+const { id, etiqueta, titulo, notaCiclo, pasos } = Astro.props;
+---
+<section class="seccion seccion--verde" id={id}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} />
+
+    <ol class="fases">
+      {pasos.map((p, i) => (
+        <li class="fase aparecer">
+          <div class="fase__marca">
+            <span class="icono-circulo"><Icono nombre={p.icono} /></span>
+            <span class="fase__numero">Fase {i + 1}</span>
+          </div>
+          <div class="fase__cuerpo">
+            <h3>{p.titulo}</h3>
+            <p class="fase__subtitulo">{p.subtitulo}</p>
+            <p>{p.texto}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+
+    {notaCiclo && (
+      <p class="ciclo aparecer"><Icono nombre="ciclo" tam={22} /> {notaCiclo}</p>
+    )}
+  </div>
+</section>
+
+<style>
+  /* Celular: línea de tiempo vertical */
+  .fases { display: grid; gap: 1.2rem; position: relative; }
+  .fase {
+    position: relative;
+    display: flex;
+    gap: 1rem;
+  }
+  /* Línea que une las fases */
+  .fase:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 92px;
+    bottom: -1.2rem;
+    width: 2px;
+    background: rgba(232, 206, 115, 0.45);
+  }
+  .fase__marca { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .fase__marca .icono-circulo { margin: 0; position: relative; z-index: 1; }
+  .fase__numero {
+    margin-top: 0.4rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+    white-space: nowrap;
+  }
+  .fase__cuerpo {
+    flex: 1;
+    padding: 1.2rem 1.3rem;
+    border-radius: var(--radio);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(232, 206, 115, 0.25);
+  }
+  .fase__cuerpo h3 { font-size: 1.05rem; }
+  .fase__subtitulo {
+    margin: 0.2rem 0 0.6rem;
+    font-family: var(--fuente-acento);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--dorado-claro);
+  }
+  .fase__cuerpo p:last-child { font-size: 0.9rem; color: #c9d6cf; }
+
+  /* Escritorio: 4 columnas con línea horizontal */
+  @media (min-width: 900px) {
+    .fases { grid-template-columns: repeat(4, 1fr); gap: var(--formacion-espacio-grid); }
+    .fase { flex-direction: column; align-items: center; text-align: center; }
+    .fase:not(:last-child)::after {
+      left: calc(50% + 34px);
+      right: calc(-50% - var(--formacion-espacio-grid) + 34px);
+      top: 28px;
+      bottom: auto;
+      width: auto;
+      height: 2px;
+    }
+    .fase__cuerpo { width: 100%; }
+  }
+
+  .ciclo {
+    margin-top: 2.5rem;
+    color: var(--dorado-claro);
+    font-weight: 500;
+    text-align: center;
+  }
+  .ciclo :global(svg) { display: inline-block; vertical-align: middle; margin-right: 0.4rem; }
+</style>

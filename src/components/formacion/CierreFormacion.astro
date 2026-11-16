@@ -1,0 +1,35 @@
+---
+// 14) Cierre de la página
+import Icono from '../Icono.astro';
+
+interface Props { frase: string; texto: string }
+const { frase, texto } = Astro.props;
+---
+<section class="f-cierre">
+  <div class="contenedor centrado aparecer">
+    <span class="icono-circulo f-cierre__icono"><Icono nombre="estrella" /></span>
+    <h2 class="f-cierre__frase">{frase}</h2>
+    <div class="linea-dorada"></div>
+    <p class="f-cierre__texto">{texto}</p>
+    <a href="/nuestra-gente" class="boton boton--borde-claro">Volver a Nuestra gente</a>
+  </div>
+</section>
+
+<style>
+  .f-cierre {
+    padding: var(--espacio-seccion) 0;
+    background:
+      radial-gradient(circle at 50% 0%, rgba(201, 162, 39, 0.22), transparent 55%),
+      linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    color: #dfe8e2;
+  }
+  .f-cierre__icono { margin-inline: auto; }
+  .f-cierre__frase {
+    font-family: var(--fuente-acento);
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    color: var(--dorado-claro);
+  }
+  .f-cierre__texto { margin: 1.2rem 0 2rem; font-size: 1.1rem; }
+</style>

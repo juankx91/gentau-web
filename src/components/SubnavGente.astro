@@ -1,15 +1,47 @@
 ---
 // Menú secundario de la sección "Nuestra gente"
+// - Escritorio: los enlaces se acomodan en una o más filas centradas (siempre completos).
+// - Celular/tablet: una fila que se desliza de lado; un desvanecido indica que hay más enlaces
+//   y la fila se mueve sola para mostrar el enlace de la página actual.
 import { menu } from '../config/site.js';
 const paginas = menu.find((m) => m.hijos)?.hijos ?? [];
 const ruta = Astro.url.pathname;
 ---
 <nav class="subnav" aria-label="Secciones de Nuestra gente">
-  <div class="contenedor subnav__fila">
-    <a href="/nuestra-gente" class:list={{ activo: ruta === '/nuestra-gente' }}>Todo</a>
-    {paginas.map((p) => <a href={p.url} class:list={{ activo: ruta === p.url }}>{p.texto}</a>)}
+  <div class="contenedor subnav__fila" data-subnav>
+    <a href="/nuestra-gente" class:list={{ activo: ruta === '/nuestra-gente' }} aria-current={ruta === '/nuestra-gente' ? 'page' : undefined}>Todo</a>
+    {paginas.map((p) => (
+      <a href={p.url} class:list={{ activo: ruta === p.url }} aria-current={ruta === p.url ? 'page' : undefined}>{p.texto}</a>
+    ))}
   </div>
 </nav>
+
+<script>
+  const fila = document.querySelector<HTMLElement>('[data-subnav]');
+  if (fila) {
+    // Desvanecido a la izquierda/derecha solo cuando hay enlaces ocultos de ese lado
+    const revisar = () => {
+      const max = fila.scrollWidth - fila.clientWidth;
+      fila.classList.toggle('subnav__fila--izq', fila.scrollLeft > 4);
+      fila.classList.toggle('subnav__fila--der', fila.scrollLeft < max - 4);
+    };
+    // Muestra el enlace activo sin mover la página
+    const centrarActivo = () => {
+      const activo = fila.querySelector<HTMLElement>('a.activo');
+      if (activo && fila.scrollWidth > fila.clientWidth) {
+        const a = activo.getBoundingClientRect();
+        const f = fila.getBoundingClientRect();
+        fila.scrollLeft += a.left - f.left - (f.width - a.width) / 2;
+      }
+      revisar();
+    };
+    centrarActivo();
+    // Las fuentes web cambian el ancho de los enlaces: se recalcula al terminar de cargar
+    document.fonts?.ready.then(centrarActivo);
+    fila.addEventListener('scroll', revisar, { passive: true });
+    window.addEventListener('resize', revisar);
+  }
+</script>
 
 <style>
   .subnav {
@@ -20,8 +52,23 @@ const ruta = Astro.url.pathname;
     border-bottom: 1px solid var(--borde);
     box-shadow: 0 6px 20px rgba(11, 61, 46, 0.05);
   }
-  .subnav__fila { display: flex; gap: 0.4rem; overflow-x: auto; padding-block: 0.8rem; scrollbar-width: none; }
+  .subnav__fila {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-block: 0.8rem;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .subnav__fila::-webkit-scrollbar { display: none; }
+
+  /* Desvanecidos que indican que hay más enlaces */
+  .subnav__fila--der { mask-image: linear-gradient(to right, #000 calc(100% - 3rem), transparent); }
+  .subnav__fila--izq { mask-image: linear-gradient(to right, transparent, #000 3rem); }
+  .subnav__fila--izq.subnav__fila--der { mask-image: linear-gradient(to right, transparent, #000 3rem, #000 calc(100% - 3rem), transparent); }
+
   .subnav a {
+    flex-shrink: 0;
     white-space: nowrap;
     padding: 0.5rem 1.1rem;
     border-radius: 999px;
@@ -33,4 +80,18 @@ const ruta = Astro.url.pathname;
   }
   .subnav a:hover { color: var(--verde-oscuro); border-color: var(--borde); }
   .subnav a.activo { background: var(--verde-oscuro); color: var(--dorado-claro); }
+  .subnav a:focus-visible { outline: 3px solid var(--dorado); outline-offset: 2px; }
+
+  /* Escritorio: todos los enlaces visibles, en filas centradas */
+  @media (min-width: 1020px) {
+    .subnav__fila {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 0.3rem;
+      overflow: visible;
+      padding-block: 0.6rem;
+      mask-image: none !important;
+    }
+    .subnav a { padding: 0.45rem 0.95rem; }
+  }
 </style>

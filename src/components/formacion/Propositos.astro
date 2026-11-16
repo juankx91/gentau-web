@@ -1,0 +1,57 @@
+---
+// 7) Propósitos del modelo (lista numerada)
+import Encabezado from '../Encabezado.astro';
+
+interface Props { id?: string; etiqueta?: string; titulo: string; lista: string[] }
+const { id, etiqueta, titulo, lista } = Astro.props;
+---
+<section class="seccion seccion--blanca" id={id}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} />
+    <ol class="propositos">
+      {lista.map((p, i) => (
+        <li class="proposito aparecer">
+          <span class="proposito__numero" aria-hidden="true">{i + 1}</span>
+          <p>{p}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .propositos {
+    display: grid;
+    gap: 1rem;
+    max-width: 960px;
+    margin-inline: auto;
+  }
+  @media (min-width: 760px) {
+    .propositos { grid-template-columns: repeat(2, 1fr); }
+    /* El último propósito ocupa todo el ancho si la cantidad es impar */
+    .proposito:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  }
+  .proposito {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.3rem;
+    background: var(--crema);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+  }
+  .proposito__numero {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde));
+    border: 2px solid var(--dorado);
+    color: var(--dorado-claro);
+    font-family: var(--fuente-titulos);
+    font-weight: 700;
+  }
+  .proposito p { color: var(--texto); font-size: 0.95rem; }
+</style>

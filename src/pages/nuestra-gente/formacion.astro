@@ -1,0 +1,53 @@
+---
+// MODELO DE FORMACIÓN EMPRESARIAL 2027
+// Los textos están en: src/data/formacion.js
+// Los colores propios de esta página están en: src/styles/variables.css (sección 7)
+// Cada sección es un componente en: src/components/formacion/
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SubnavGente from '../../components/SubnavGente.astro';
+import FormacionHero from '../../components/formacion/FormacionHero.astro';
+import Aprendizaje from '../../components/formacion/Aprendizaje.astro';
+import GridTarjetas from '../../components/formacion/GridTarjetas.astro';
+import Propositos from '../../components/formacion/Propositos.astro';
+import LineasFormacion from '../../components/formacion/LineasFormacion.astro';
+import EstructuraModelo from '../../components/formacion/EstructuraModelo.astro';
+import FasesModelo from '../../components/formacion/FasesModelo.astro';
+import ComponentesPlan from '../../components/formacion/ComponentesPlan.astro';
+import Cronograma from '../../components/formacion/Cronograma.astro';
+import CierreFormacion from '../../components/formacion/CierreFormacion.astro';
+import { formacion as f } from '../../data/formacion.js';
+---
+<BaseLayout
+  titulo={`${f.hero.titulo} ${f.anio}`}
+  descripcion={`${f.hero.titulo} de GENTAU: líneas, programas, fases y cronograma del plan de formación ${f.anio}.`}
+>
+  <div class="formacion">
+    <FormacionHero {...f.hero} />
+    <SubnavGente />
+
+    <Aprendizaje id="aprendizaje" {...f.aprendizaje} />
+    <GridTarjetas id="conceptos" {...f.conceptos} fondo="blanca" anchoMinimo="280px" />
+    <GridTarjetas id="tipos" {...f.tipos} fondo="crema" anchoMinimo="280px" />
+    <GridTarjetas id="principios" {...f.principios} fondo="verde" anchoMinimo="200px" numerar />
+    <GridTarjetas id="cultura" {...f.cultura} fondo="crema" anchoMinimo="280px" />
+    <Propositos id="propositos" {...f.propositos} />
+    <LineasFormacion id="lineas" {...f.lineas} />
+    <EstructuraModelo id="estructura" {...f.estructura} lineas={f.lineas.items} />
+    <FasesModelo id="fases" {...f.fases} />
+    <ComponentesPlan id="componentes" {...f.componentes} />
+    <Cronograma id="cronograma" {...f.cronograma} lineas={f.lineas.items} />
+    <GridTarjetas id="resultados" {...f.resultados} fondo="menta" anchoMinimo="300px" />
+    <CierreFormacion {...f.cierre} />
+  </div>
+</BaseLayout>
+
+<style>
+  /* Foco visible al navegar con teclado en toda la página */
+  .formacion :global(:focus-visible) {
+    outline: var(--formacion-foco);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  /* Deja espacio para el menú fijo al saltar a una sección (#lineas, #cronograma…) */
+  .formacion :global(section[id]) { scroll-margin-top: 150px; }
+</style>

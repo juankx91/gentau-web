@@ -1,0 +1,251 @@
+---
+// 8) Líneas de formación: pestañas accesibles (Científica, Filosófica, Técnica)
+// Teclado: flechas izquierda/derecha, Inicio y Fin para cambiar de pestaña.
+import Encabezado from '../Encabezado.astro';
+import Icono from '../Icono.astro';
+
+interface Linea {
+  id: string;
+  nombre: string;
+  icono: string;
+  proyecto: string;
+  objetivo: string;
+  alcance: string;
+  contenido: { conocimientos: string; habilidades: string; valores: string };
+  metodos: string;
+  medios: string;
+  formas: string;
+  evaluacion: string;
+  programas: string[];
+}
+interface Props { id?: string; etiqueta?: string; titulo: string; texto?: string; items: Linea[] }
+const { id = 'lineas', etiqueta, titulo, texto, items } = Astro.props;
+
+// Orden y rótulos de los campos que se muestran en cada línea
+const campos = [
+  { clave: 'objetivo', rotulo: 'Objetivo', icono: 'diana' },
+  { clave: 'alcance', rotulo: 'Alcance', icono: 'personas' },
+  { clave: 'metodos', rotulo: 'Métodos', icono: 'chat' },
+  { clave: 'medios', rotulo: 'Medios', icono: 'maletin' },
+  { clave: 'formas', rotulo: 'Formas', icono: 'calendario' },
+  { clave: 'evaluacion', rotulo: 'Evaluación', icono: 'check' },
+] as const;
+---
+<section class="seccion" id={id}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} texto={texto} />
+
+    <div class="lineas" data-lineas>
+      <div class="lineas__pestanas" role="tablist" aria-label="Líneas de formación">
+        {items.map((l, i) => (
+          <button
+            type="button"
+            role="tab"
+            id={`pestana-${l.id}`}
+            aria-controls={`panel-${l.id}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            class="lineas__pestana"
+            style={`--color-linea: var(--formacion-linea-${l.id})`}
+            data-pestana
+          >
+            <Icono nombre={l.icono} tam={20} />
+            <span>{l.nombre}</span>
+          </button>
+        ))}
+      </div>
+
+      {items.map((l, i) => (
+        <div
+          role="tabpanel"
+          id={`panel-${l.id}`}
+          aria-labelledby={`pestana-${l.id}`}
+          class="linea-panel"
+          style={`--color-linea: var(--formacion-linea-${l.id})`}
+          hidden={i !== 0}
+          tabindex="0"
+          data-panel
+        >
+          <header class="linea-panel__cabeza">
+            <span class="icono-circulo"><Icono nombre={l.icono} /></span>
+            <div>
+              <p class="linea-panel__linea">Línea {l.nombre}</p>
+              <h3><span class="oculto-visual">Proyecto: </span>{l.proyecto}</h3>
+            </div>
+          </header>
+
+          <dl class="linea-panel__campos">
+            {campos.slice(0, 2).map((c) => (
+              <div class="campo">
+                <dt><Icono nombre={c.icono} tam={18} /> {c.rotulo}</dt>
+                <dd>{l[c.clave]}</dd>
+              </div>
+            ))}
+
+            <div class="campo campo--ancho">
+              <dt><Icono nombre="libro" tam={18} /> Contenido</dt>
+              <dd>
+                <ul class="contenido">
+                  <li><strong>Conocimientos:</strong> {l.contenido.conocimientos}</li>
+                  <li><strong>Habilidades:</strong> {l.contenido.habilidades}</li>
+                  <li><strong>Valores:</strong> {l.contenido.valores}</li>
+                </ul>
+              </dd>
+            </div>
+
+            {campos.slice(2).map((c) => (
+              <div class="campo">
+                <dt><Icono nombre={c.icono} tam={18} /> {c.rotulo}</dt>
+                <dd>{l[c.clave]}</dd>
+              </div>
+            ))}
+
+            <div class="campo campo--ancho">
+              <dt><Icono nombre="lista" tam={18} /> Programas</dt>
+              <dd>
+                <ul class="programas">
+                  {l.programas.map((p) => <li>{p}</li>)}
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script>
+  // Pestañas accesibles (patrón WAI-ARIA "tabs")
+  document.querySelectorAll<HTMLElement>('[data-lineas]').forEach((grupo) => {
+    const pestanas = Array.from(grupo.querySelectorAll<HTMLButtonElement>('[data-pestana]'));
+    const paneles = Array.from(grupo.querySelectorAll<HTMLElement>('[data-panel]'));
+
+    const activar = (indice: number, enfocar = false) => {
+      pestanas.forEach((p, i) => {
+        const activa = i === indice;
+        p.setAttribute('aria-selected', String(activa));
+        p.tabIndex = activa ? 0 : -1;
+        paneles[i].hidden = !activa;
+      });
+      if (enfocar) pestanas[indice].focus();
+    };
+
+    pestanas.forEach((p, i) => {
+      p.addEventListener('click', () => activar(i));
+      p.addEventListener('keydown', (e) => {
+        const ultimo = pestanas.length - 1;
+        const destino =
+          e.key === 'ArrowRight' ? (i === ultimo ? 0 : i + 1)
+          : e.key === 'ArrowLeft' ? (i === 0 ? ultimo : i - 1)
+          : e.key === 'Home' ? 0
+          : e.key === 'End' ? ultimo
+          : null;
+        if (destino !== null) { e.preventDefault(); activar(destino, true); }
+      });
+    });
+  });
+</script>
+
+<style>
+  .lineas__pestanas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .lineas__pestana {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.8rem 0.5rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--blanco);
+    color: var(--texto-suave);
+    font-size: var(--tam-pequeno);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--transicion), color var(--transicion), border-color var(--transicion);
+  }
+  .lineas__pestana :global(svg) { color: var(--color-linea); }
+  .lineas__pestana:hover { border-color: var(--dorado); color: var(--verde-oscuro); }
+  .lineas__pestana[aria-selected='true'] {
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    border-color: var(--dorado);
+    color: var(--dorado-claro);
+  }
+  .lineas__pestana[aria-selected='true'] :global(svg) { color: var(--dorado-claro); }
+  @media (min-width: 680px) {
+    .lineas__pestanas { display: flex; justify-content: center; gap: 0.8rem; }
+    .lineas__pestana { flex-direction: row; padding: 0.8rem 1.6rem; border-radius: var(--formacion-radio-pastilla); }
+  }
+
+  .linea-panel {
+    padding: var(--formacion-espacio-tarjeta);
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-top: 5px solid var(--color-linea);
+    border-radius: var(--radio-grande);
+    box-shadow: var(--sombra);
+  }
+  .linea-panel:not([hidden]) { animation: f-panel 0.4s ease; }
+  @keyframes f-panel { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .linea-panel:not([hidden]) { animation: none; } }
+
+  .linea-panel__cabeza {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.3rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--borde);
+  }
+  .linea-panel__cabeza .icono-circulo { margin: 0; }
+  .linea-panel__linea {
+    font-size: var(--tam-etiqueta);
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--verde);
+  }
+  .linea-panel__cabeza h3 { font-size: clamp(1.2rem, 2.4vw, 1.6rem); }
+
+  .linea-panel__campos { display: grid; gap: 1rem; }
+  @media (min-width: 760px) {
+    .linea-panel__campos { grid-template-columns: repeat(2, 1fr); }
+    .campo--ancho { grid-column: 1 / -1; }
+  }
+  .campo {
+    padding: 1rem 1.2rem;
+    border-radius: var(--radio);
+    background: var(--crema);
+  }
+  .campo dt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
+    font-family: var(--fuente-titulos);
+    font-weight: 600;
+    color: var(--verde-oscuro);
+  }
+  .campo dt :global(svg) { color: var(--dorado); flex-shrink: 0; }
+  .campo dd { font-size: 0.92rem; color: var(--texto-suave); }
+
+  .contenido { display: grid; gap: 0.4rem; }
+  @media (min-width: 900px) { .contenido { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
+  .contenido strong { display: block; color: var(--verde); }
+
+  .programas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.3rem; }
+  .programas li {
+    padding: 0.4rem 0.9rem;
+    border-radius: var(--formacion-radio-pastilla);
+    background: var(--blanco);
+    border: 1px solid var(--color-linea);
+    color: var(--verde-oscuro);
+    font-size: var(--tam-pequeno);
+    font-weight: 500;
+  }
+</style>

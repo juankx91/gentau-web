@@ -116,10 +116,13 @@ try {
         <span class="etiqueta">Nuestra gente</span>
         <h2>Un equipo feliz crea moda con más pasión</h2>
         <p class="mt-2">
-          Conoce nuestro Plan de Bienestar 2027, la Seguridad y Salud en el Trabajo, el proceso de inducción,
-          el Reglamento Interno, las Políticas y el Manual de Imagen de GENTAU.
+          Conoce nuestro Plan de Bienestar 2027, el Modelo de Formación 2027, la Seguridad y Salud en el Trabajo,
+          el proceso de inducción, el Reglamento Interno, las Políticas y el Manual de Imagen de GENTAU.
         </p>
-        <a href="/nuestra-gente" class="boton boton--dorado mt-2">Conocer más <Icono nombre="flecha" tam={18} /></a>
+        <div class="banda-gente__botones mt-2">
+          <a href="/nuestra-gente" class="boton boton--dorado">Conocer más <Icono nombre="flecha" tam={18} /></a>
+          <a href="/nuestra-gente/formacion" class="boton boton--borde-claro">Modelo de Formación 2027</a>
+        </div>
       </div>
       <blockquote class="frase-gente aparecer">
         <span class="comillas">“</span>
@@ -181,6 +184,7 @@ try {
     color: #d7e2dc;
   }
   .banda-gente h2 { color: var(--blanco); }
+  .banda-gente__botones { display: flex; flex-wrap: wrap; gap: 0.8rem; }
   .frase-gente {
     position: relative;
     padding: 2.5rem;

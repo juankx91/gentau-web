@@ -1,0 +1,239 @@
+---
+// 9) Estructura del modelo: flujo de niveles + árbol de líneas, proyectos y programas.
+// Los proyectos y programas se leen de las líneas de formación (no se repiten en los datos).
+import Encabezado from '../Encabezado.astro';
+import Icono from '../Icono.astro';
+import EtiquetaLinea from './EtiquetaLinea.astro';
+
+interface Props {
+  id?: string;
+  etiqueta?: string;
+  titulo: string;
+  niveles: string[];
+  raiz: string;
+  actividades: string;
+  lineas: { id: string; nombre: string; icono: string; proyecto: string; programas: string[] }[];
+}
+const { id, etiqueta, titulo, niveles, raiz, actividades, lineas } = Astro.props;
+---
+<section class="seccion seccion--blanca" id={id}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} />
+
+    <!-- Flujo general -->
+    <ol class="flujo aparecer" aria-label="Niveles del modelo, de lo general a lo particular">
+      {niveles.map((n, i) => (
+        <li class="flujo__nivel">
+          <span class="flujo__numero" aria-hidden="true">{i + 1}</span>
+          {n}
+        </li>
+      ))}
+    </ol>
+
+    <!-- Árbol -->
+    <div class="arbol aparecer">
+      <div class="arbol__raiz">
+        <span class="icono-circulo"><Icono nombre="birrete" /></span>
+        <p><span class="arbol__rotulo">{niveles[0]}</span>{raiz}</p>
+      </div>
+
+      <ul class="arbol__ramas">
+        {lineas.map((l) => (
+          <li class="rama" style={`--color-linea: var(--formacion-linea-${l.id})`}>
+            <div class="nodo nodo--linea">
+              <span class="arbol__rotulo">{niveles[1]}</span>
+              <h3><EtiquetaLinea linea={l.id} texto={l.nombre} /></h3>
+            </div>
+            <div class="nodo">
+              <span class="arbol__rotulo">{niveles[2]}</span>
+              <p class="nodo__proyecto">{l.proyecto}</p>
+            </div>
+            <div class="nodo">
+              <span class="arbol__rotulo">{niveles[3]}</span>
+              <ul class="nodo__programas">
+                {l.programas.map((p) => <li>{p}</li>)}
+              </ul>
+            </div>
+            <div class="nodo nodo--actividades">
+              <span class="arbol__rotulo">{niveles[4]}</span>
+              <p>{actividades}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* --- Flujo: vertical en celular, horizontal en escritorio --- */
+  .flujo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.6rem;
+    margin-bottom: 3rem;
+  }
+  .flujo__nivel {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 190px;
+    padding: 0.6rem 1.2rem 0.6rem 0.6rem;
+    border-radius: var(--formacion-radio-pastilla);
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    border: 1px solid var(--dorado);
+    color: var(--blanco);
+    font-family: var(--fuente-titulos);
+    font-weight: 600;
+  }
+  .flujo__numero {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--degradado-dorado);
+    color: var(--formacion-texto-sobre-dorado);
+    font-size: 0.85rem;
+  }
+  /* Flecha entre niveles */
+  .flujo__nivel:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    width: 2px;
+    height: 1.6rem;
+    background: var(--dorado);
+    transform: translateX(-50%);
+  }
+  .flujo__nivel:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 1.6rem - 7px);
+    border: 6px solid transparent;
+    border-top-color: var(--dorado);
+    transform: translateX(-50%);
+  }
+  @media (min-width: 900px) {
+    .flujo { flex-direction: row; justify-content: center; gap: 2.2rem; }
+    .flujo__nivel { min-width: 0; }
+    .flujo__nivel:not(:last-child)::after { left: 100%; top: 50%; width: 2.2rem; height: 2px; transform: translateY(-50%); }
+    .flujo__nivel:not(:last-child)::before { left: calc(100% + 2.2rem - 7px); top: 50%; border-top-color: transparent; border-left-color: var(--dorado); transform: translateY(-50%); }
+  }
+
+  /* --- Árbol --- */
+  .arbol__raiz {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 1rem 1.4rem;
+    border-radius: var(--radio);
+    background: var(--crema);
+    border: 2px solid var(--dorado);
+  }
+  .arbol__raiz .icono-circulo { margin: 0; }
+  .arbol__raiz p { font-family: var(--fuente-titulos); font-weight: 600; color: var(--verde-oscuro); }
+  .arbol__rotulo {
+    display: block;
+    font-family: var(--fuente-texto);
+    font-size: var(--tam-etiqueta);
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--verde);
+  }
+
+  .arbol__ramas {
+    display: grid;
+    gap: var(--formacion-espacio-grid);
+    margin-top: 2.5rem;
+    position: relative;
+  }
+  /* Conector desde la raíz */
+  .arbol__ramas::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -2.5rem;
+    width: 2px;
+    height: 2.5rem;
+    background: var(--dorado);
+  }
+  @media (min-width: 900px) {
+    .arbol__ramas { grid-template-columns: repeat(3, 1fr); }
+    /* Línea horizontal que une las tres ramas */
+    .arbol__ramas::after {
+      content: '';
+      position: absolute;
+      top: -1.25rem;
+      left: calc(100% / 6);
+      right: calc(100% / 6);
+      height: 2px;
+      background: var(--dorado);
+    }
+    .arbol__ramas::before { height: 1.25rem; }
+    .rama::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: -1.25rem;
+      width: 2px;
+      height: 1.25rem;
+      background: var(--dorado);
+    }
+  }
+
+  .rama {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1rem;
+    border-radius: var(--radio);
+    background: var(--crema);
+    border-top: 4px solid var(--color-linea);
+  }
+  .nodo {
+    position: relative;
+    padding: 0.8rem 1rem;
+    border-radius: calc(var(--radio) - 4px);
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+  }
+  /* Pequeña flecha entre nodos de la misma rama */
+  .nodo:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -0.6rem;
+    width: 2px;
+    height: 0.6rem;
+    background: var(--color-linea);
+  }
+  .nodo--linea h3 { font-size: 1rem; margin-top: 0.3rem; }
+  .nodo__proyecto { font-family: var(--fuente-titulos); font-weight: 600; color: var(--verde-oscuro); }
+  .nodo__programas { margin-top: 0.3rem; }
+  .nodo__programas li {
+    position: relative;
+    padding-left: 1rem;
+    font-size: var(--tam-pequeno);
+    color: var(--texto-suave);
+  }
+  .nodo__programas li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.65em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--dorado);
+  }
+  .nodo--actividades p { font-size: var(--tam-pequeno); color: var(--texto-suave); }
+</style>

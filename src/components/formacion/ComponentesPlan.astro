@@ -1,0 +1,89 @@
+---
+// 11) Componentes del plan: tabla de dos columnas (en celular se ve como lista)
+import Encabezado from '../Encabezado.astro';
+
+interface Props {
+  id?: string;
+  etiqueta?: string;
+  titulo: string;
+  filas: { pregunta: string; respuesta: string }[];
+}
+const { id, etiqueta, titulo, filas } = Astro.props;
+---
+<section class="seccion" id={id}>
+  <div class="contenedor">
+    <Encabezado etiqueta={etiqueta} titulo={titulo} />
+    <div class="plan aparecer">
+      <table class="plan__tabla">
+        <caption class="oculto-visual">{titulo}</caption>
+        <thead>
+          <tr><th scope="col">Pregunta</th><th scope="col">Respuesta</th></tr>
+        </thead>
+        <tbody>
+          {filas.map((f) => (
+            <tr>
+              <th scope="row">{f.pregunta}</th>
+              <td>{f.respuesta}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<style>
+  .plan { max-width: 960px; margin-inline: auto; }
+  .plan__tabla { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  /* Celular: cada fila es una tarjeta */
+  .plan__tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .plan__tabla tbody, .plan__tabla tr, .plan__tabla th, .plan__tabla td { display: block; }
+  .plan__tabla tr {
+    margin-bottom: 0.8rem;
+    border-radius: var(--radio);
+    overflow: hidden;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    box-shadow: var(--sombra);
+  }
+  .plan__tabla tbody th {
+    padding: 0.7rem 1.2rem;
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    color: var(--dorado-claro);
+    font-family: var(--fuente-titulos);
+    font-weight: 600;
+    text-align: left;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+  }
+  .plan__tabla td { padding: 0.9rem 1.2rem; color: var(--texto-suave); font-size: 0.95rem; }
+
+  /* Tablet y escritorio: tabla real de dos columnas */
+  @media (min-width: 680px) {
+    .plan {
+      border-radius: var(--radio);
+      overflow: hidden;
+      box-shadow: var(--sombra);
+      border: 1px solid var(--borde);
+    }
+    .plan__tabla thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+    .plan__tabla tbody { display: table-row-group; }
+    .plan__tabla tr { display: table-row; box-shadow: none; border: 0; }
+    .plan__tabla th, .plan__tabla td { display: table-cell; vertical-align: middle; }
+    .plan__tabla thead th {
+      padding: 0.9rem 1.4rem;
+      background: var(--degradado-dorado);
+      color: var(--formacion-texto-sobre-dorado);
+      text-align: left;
+      font-size: var(--tam-etiqueta);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+    .plan__tabla tbody th { width: 30%; padding: 1rem 1.4rem; border-bottom: 1px solid rgba(232, 206, 115, 0.2); }
+    .plan__tabla td { padding: 1rem 1.4rem; background: var(--blanco); border-bottom: 1px solid var(--borde); }
+    .plan__tabla tr:nth-child(even) td { background: var(--crema); }
+    .plan__tabla tr:last-child th, .plan__tabla tr:last-child td { border-bottom: 0; }
+  }
+</style>

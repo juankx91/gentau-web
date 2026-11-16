@@ -1,0 +1,30 @@
+---
+// Pastilla de color que identifica una línea de formación.
+// Los colores vienen de src/styles/variables.css (--formacion-linea-*).
+interface Props { linea: string; texto: string }
+const { linea, texto } = Astro.props;
+
+const colores: Record<string, { fondo: string; letra: string }> = {
+  cientifica: { fondo: 'var(--formacion-linea-cientifica)', letra: 'var(--blanco)' },
+  filosofica: { fondo: 'var(--formacion-linea-filosofica)', letra: 'var(--formacion-texto-sobre-dorado)' },
+  tecnica: { fondo: 'var(--formacion-linea-tecnica)', letra: 'var(--blanco)' },
+  todas: { fondo: 'var(--degradado-dorado)', letra: 'var(--formacion-texto-sobre-dorado)' },
+};
+const c = colores[linea] ?? colores.todas;
+---
+<span class="etiqueta-linea" style={`--fondo-linea: ${c.fondo}; --letra-linea: ${c.letra}`}>{texto}</span>
+
+<style>
+  .etiqueta-linea {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--formacion-radio-pastilla);
+    background: var(--fondo-linea);
+    color: var(--letra-linea);
+    font-size: var(--tam-etiqueta);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+</style>

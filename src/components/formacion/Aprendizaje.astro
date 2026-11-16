@@ -1,0 +1,64 @@
+---
+// 2) Aprendizaje: definición + los cuatro momentos del conocimiento
+import Icono from '../Icono.astro';
+
+interface Props {
+  id?: string;
+  etiqueta: string;
+  titulo: string;
+  definicion: string;
+  pasos: { texto: string; icono: string }[];
+}
+const { id, etiqueta, titulo, definicion, pasos } = Astro.props;
+---
+<section class="seccion" id={id}>
+  <div class="contenedor dos-columnas">
+    <div class="aparecer">
+      <span class="etiqueta">{etiqueta}</span>
+      <h2>{titulo}</h2>
+      <p class="frase mt-2">{definicion}</p>
+    </div>
+
+    <ol class="pasos aparecer" aria-label="Momentos del aprendizaje">
+      {pasos.map((p, i) => (
+        <li class="paso">
+          <span class="icono-circulo"><Icono nombre={p.icono} /></span>
+          <span class="paso__numero" aria-hidden="true">0{i + 1}</span>
+          <span class="paso__texto">{p.texto}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .pasos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--formacion-espacio-grid);
+  }
+  .paso {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--formacion-espacio-tarjeta) 1rem;
+    text-align: center;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+  }
+  .paso .icono-circulo { margin-bottom: 0.8rem; }
+  .paso__numero {
+    font-size: var(--tam-etiqueta);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--verde);
+  }
+  .paso__texto {
+    font-family: var(--fuente-titulos);
+    font-size: var(--tam-h3);
+    font-weight: 600;
+    color: var(--verde-oscuro);
+  }
+</style>

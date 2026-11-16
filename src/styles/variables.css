@@ -58,4 +58,16 @@
   /* 6) CARRUSEL DEL INICIO */
   --carrusel-alto: 380px;      /* alto de las fotos del carrusel */
   --carrusel-velocidad: 45s;   /* más segundos = se mueve más lento */
+
+  /* 7) MODELO DE FORMACIÓN (/nuestra-gente/formacion)
+     Usa los colores de arriba; aquí solo lo propio de esa página. */
+  --formacion-verde-hoja: #2b4020;    /* verde oliva de apoyo (presentación) */
+  --formacion-linea-cientifica: #1b5e44;
+  --formacion-linea-filosofica: #c9a227;
+  --formacion-linea-tecnica: #2b4020;
+  --formacion-texto-sobre-dorado: #062a1f;
+  --formacion-espacio-tarjeta: clamp(1.4rem, 3vw, 2rem); /* relleno interno de tarjetas */
+  --formacion-espacio-grid: 1.5rem;   /* separación entre tarjetas */
+  --formacion-radio-pastilla: 999px;  /* botones y etiquetas redondeadas */
+  --formacion-foco: 3px solid var(--dorado); /* contorno al navegar con teclado */
 }
