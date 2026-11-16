@@ -12,8 +12,8 @@ export const site = {
     'GENTAU es una marca colombiana de diseño y confección de ropa femenina y masculina, pensada para todos los cuerpos y con impacto social real.',
 
   // --- Contacto ---
-  telefono: '+57 300 000 0000',
-  whatsapp: '573000000000', // solo números, con indicativo (57 = Colombia)
+  telefono: '+57 301 730 1659',
+  whatsapp: '573017301659', // solo números, con indicativo (57 = Colombia)
   correo: 'contacto@gentau.co',
   direccion: 'Medellín, Antioquia, Colombia',
   horario: 'Lunes a sábado · 9:00 a.m. – 7:00 p.m.',
