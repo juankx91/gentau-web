@@ -92,10 +92,46 @@ Las fotos se guardan en la carpeta `gentau/` de tu Cloudinary. Cuando borras un 
 
 ---
 
-## 5. Publicar en Render
+## 5. Subir el proyecto a GitHub
 
-1. Sube el proyecto a GitHub (el `.gitignore` ya evita subir `.env` y `node_modules`).
-2. En https://render.com → **New → Web Service** → conecta tu repositorio.
+El proyecto ya viene como repositorio Git con su primer commit (rama `main`).
+El `.gitignore` evita subir `.env`, `node_modules` y la base de datos local.
+
+1. Instala Git: https://git-scm.com (en Windows, deja las opciones por defecto).
+2. En https://github.com/new crea un repositorio llamado **gentau-web**.
+   **No** marques "Add a README" ni ".gitignore" (el proyecto ya los tiene).
+3. En la terminal de VS Code, dentro de la carpeta del proyecto:
+
+```bash
+git remote add origin https://github.com/juankx91/gentau-web.git
+git push -u origin main
+```
+
+La primera vez, Windows abre una ventana para iniciar sesión en GitHub.
+
+### Guardar cambios después
+
+Cada vez que modifiques algo (colores, textos, etc.):
+
+```bash
+git add .
+git commit -m "Describe aquí el cambio, ej: cambio el color dorado"
+git push
+```
+
+### Revisión automática (GitHub Actions)
+
+El archivo `.github/workflows/build.yml` revisa en GitHub que la página compile cada vez que haces `git push`.
+En la pestaña **Actions** de tu repositorio verás ✅ si todo está bien o ❌ si algo falló (y el detalle del error).
+
+---
+
+## 6. Publicar en Render (conectado a GitHub)
+
+Render toma el código directamente de tu repositorio de GitHub y **se actualiza solo cada vez que haces `git push`**.
+
+1. Primero sube el proyecto a GitHub (paso 5).
+2. En https://render.com → **New → Web Service** → conecta tu cuenta de GitHub y elige el repositorio **gentau-web**.
 3. Configura:
    - **Build Command:** `npm install && npm run build`
    - **Start Command:** `npm start`
@@ -118,7 +154,7 @@ SESSION_SECRET=una-frase-larga-y-aleatoria
 
 ---
 
-## 6. Video del inicio
+## 7. Video del inicio
 
 Tienes dos opciones:
 
@@ -129,9 +165,10 @@ Recomendado: MP4 horizontal, de 10 a 30 segundos y liviano (menos de 20 MB si va
 
 ---
 
-## 7. Estructura del proyecto
+## 8. Estructura del proyecto
 
 ```
+.github/workflows/build.yml ← revisión automática en GitHub
 src/
 ├── config/site.js          ← datos de la empresa y menú
 ├── styles/
