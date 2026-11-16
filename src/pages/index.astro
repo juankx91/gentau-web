@@ -1,0 +1,195 @@
+---
+// PÁGINA DE INICIO
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Carrusel from '../components/Carrusel.astro';
+import Encabezado from '../components/Encabezado.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import Icono from '../components/Icono.astro';
+import { quienesSomos, mision, vision, valores, cifras } from '../data/empresa.js';
+import { obtenerAjustes, obtenerCarrusel, obtenerProductosDestacados } from '../lib/db.js';
+
+// Datos desde la base de datos (si falla, la página igual carga)
+let ajustes = {}, fotos = [], productos = [];
+try {
+  [ajustes, fotos, productos] = await Promise.all([obtenerAjustes(), obtenerCarrusel(), obtenerProductosDestacados(4)]);
+} catch (error) {
+  console.error('Error cargando datos del inicio:', error);
+}
+---
+<BaseLayout headerTransparente>
+  <Hero video={ajustes.hero_video_url} />
+
+  <!-- QUIÉNES SOMOS -->
+  <section class="seccion" id="descubre">
+    <div class="contenedor dos-columnas">
+      <div class="aparecer">
+        <span class="etiqueta">Quiénes somos</span>
+        <h2>{quienesSomos.titulo}</h2>
+        <p class="texto-suave mt-2">{quienesSomos.texto}</p>
+        <div class="pilares">
+          {quienesSomos.pilares.map((p) => (
+            <div class="pilar">
+              <span class="icono-circulo"><Icono nombre={p.icono} /></span>
+              <div>
+                <h3>{p.titulo}</h3>
+                <p>{p.texto}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <a href="/nosotros" class="boton boton--verde mt-2">Nuestra historia <Icono nombre="flecha" tam={18} /></a>
+      </div>
+      <div class="imagen-marco aparecer">
+        <img src="/img/disenadora.jpg" alt="Diseñadora de GENTAU en su taller" loading="lazy" />
+        <div class="sello">
+          <strong>100%</strong>
+          <span>Diseño colombiano</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CIFRAS -->
+  <section class="cifras">
+    <div class="contenedor cifras__grid">
+      {cifras.map((c) => (
+        <div class="cifra aparecer">
+          <strong>{c.numero}</strong>
+          <span>{c.texto}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- CARRUSEL -->
+  <section class="seccion seccion--blanca">
+    <div class="contenedor">
+      <Encabezado etiqueta="Galería" titulo="Vistamos historias reales" texto="Cada prenda GENTAU nace de un diseño propio y de las manos de un equipo que transforma vidas." />
+    </div>
+    <Carrusel fotos={fotos} />
+  </section>
+
+  <!-- MISIÓN Y VISIÓN -->
+  <section class="seccion seccion--verde">
+    <div class="contenedor">
+      <Encabezado etiqueta="Nuestro propósito" titulo="Misión y Visión" />
+      <div class="grid grid-2">
+        <article class="tarjeta tarjeta--verde aparecer">
+          <span class="icono-circulo"><Icono nombre="bandera" /></span>
+          <h3>Misión</h3>
+          <p>{mision}</p>
+        </article>
+        <article class="tarjeta tarjeta--verde aparecer">
+          <span class="icono-circulo"><Icono nombre="grafica" /></span>
+          <h3>Visión</h3>
+          <p>{vision}</p>
+        </article>
+      </div>
+      <div class="valores-chips aparecer">
+        {valores.map((v) => <span><Icono nombre={v.icono} tam={16} /> {v.titulo}</span>)}
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTOS DESTACADOS -->
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Colección" titulo="Prendas destacadas" texto="Tallas reales, siluetas para todos y la mejor calidad colombiana." />
+      {productos.length > 0 ? (
+        <div class="grid grid-4">
+          {productos.map((p) => <TarjetaProducto producto={p} />)}
+        </div>
+      ) : (
+        <p class="centrado texto-suave">Muy pronto verás aquí nuestra colección.</p>
+      )}
+      <div class="centrado mt-3">
+        <a href="/productos" class="boton boton--borde">Ver todos los productos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUESTRA GENTE -->
+  <section class="banda-gente">
+    <div class="contenedor dos-columnas">
+      <div class="aparecer">
+        <span class="etiqueta">Nuestra gente</span>
+        <h2>Un equipo feliz crea moda con más pasión</h2>
+        <p class="mt-2">
+          Conoce nuestro Plan de Bienestar 2027, la Seguridad y Salud en el Trabajo, el proceso de inducción,
+          el Reglamento Interno, las Políticas y el Manual de Imagen de GENTAU.
+        </p>
+        <a href="/nuestra-gente" class="boton boton--dorado mt-2">Conocer más <Icono nombre="flecha" tam={18} /></a>
+      </div>
+      <blockquote class="frase-gente aparecer">
+        <span class="comillas">“</span>
+        <p class="frase">Cuando cuidamos a las personas, el equipo se convierte en familia y la moda en una forma de inspirar.</p>
+        <footer>— Plan de Bienestar GENTAU</footer>
+      </blockquote>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .pilares { display: grid; gap: 1.2rem; margin-top: 2rem; }
+  .pilar { display: flex; gap: 1rem; align-items: flex-start; }
+  .pilar .icono-circulo { width: 50px; height: 50px; margin: 0; }
+  .pilar .icono-circulo :global(svg) { width: 22px; height: 22px; }
+  .pilar h3 { font-size: 1rem; }
+  .pilar p { font-size: 0.9rem; color: var(--texto-suave); }
+
+  .sello {
+    position: absolute;
+    left: -1.5rem;
+    bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.2rem 1.6rem;
+    border-radius: var(--radio);
+    background: var(--verde-oscuro);
+    border: 2px solid var(--dorado);
+    box-shadow: var(--sombra-fuerte);
+  }
+  .sello strong { font-family: var(--fuente-titulos); font-size: 2rem; color: var(--dorado-claro); line-height: 1; }
+  .sello span { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #d7e2dc; margin-top: 0.3rem; }
+
+  .cifras { background: var(--degradado-dorado); padding: 3rem 0; }
+  .cifras__grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+  .cifra { text-align: center; color: var(--verde-noche); }
+  .cifra strong { display: block; font-family: var(--fuente-titulos); font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.1; }
+  .cifra span { font-size: 0.85rem; font-weight: 500; }
+  @media (max-width: 760px) { .cifras__grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .valores-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.7rem; margin-top: 2.5rem; }
+  .valores-chips span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1.1rem;
+    border: 1px solid rgba(232, 206, 115, 0.4);
+    border-radius: 999px;
+    font-size: 0.82rem;
+    color: var(--dorado-claro);
+  }
+
+  .banda-gente {
+    padding: var(--espacio-seccion) 0;
+    background:
+      linear-gradient(120deg, rgba(6, 42, 31, 0.96), rgba(11, 61, 46, 0.86)),
+      url('/img/boutique.jpg') center / cover fixed;
+    color: #d7e2dc;
+  }
+  .banda-gente h2 { color: var(--blanco); }
+  .frase-gente {
+    position: relative;
+    padding: 2.5rem;
+    border-radius: var(--radio-grande);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(232, 206, 115, 0.35);
+    backdrop-filter: blur(6px);
+  }
+  .frase-gente .frase { color: var(--blanco); }
+  .frase-gente footer { margin-top: 1.2rem; color: var(--dorado-claro); font-size: 0.85rem; letter-spacing: 0.1em; }
+  .comillas { position: absolute; top: -1.5rem; left: 1.5rem; font-family: var(--fuente-acento); font-size: 6rem; line-height: 1; color: var(--dorado); }
+</style>

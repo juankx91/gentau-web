@@ -1,0 +1,75 @@
+---
+// Carrusel automático (sin botones). Las fotos se administran desde /admin.
+// Velocidad y alto: cambia --carrusel-velocidad y --carrusel-alto en variables.css
+import { optimizar } from '../lib/cloudinary.js';
+
+interface Foto { imagen_url: string; texto?: string | null }
+interface Props { fotos: Foto[] }
+
+// Si todavía no has subido fotos, se muestran estas de ejemplo
+const ejemplo: Foto[] = [
+  { imagen_url: '/img/boutique.jpg', texto: 'Nuestra tienda' },
+  { imagen_url: '/img/perchero.jpg', texto: 'Colección GENTAU' },
+  { imagen_url: '/img/disenadora.jpg', texto: 'Diseño propio' },
+  { imagen_url: '/img/bolsa.jpg', texto: 'Moda que inspira' },
+  { imagen_url: '/img/dotacion.jpg', texto: 'Calidad colombiana' },
+];
+const base = Astro.props.fotos.length ? Astro.props.fotos : ejemplo;
+
+// Se repiten las fotos para que siempre llenen la pantalla y el giro sea continuo
+let lista = [...base];
+while (lista.length < 8) lista = [...lista, ...base];
+const pista = [...lista, ...lista];
+---
+<div class="carrusel" aria-label="Galería de fotos GENTAU">
+  <div class="carrusel__pista">
+    {pista.map((foto, i) => (
+      <figure class="carrusel__item" aria-hidden={i >= lista.length ? 'true' : undefined}>
+        <img src={optimizar(foto.imagen_url, 700)} alt={foto.texto || 'Foto GENTAU'} loading="eager" decoding="async" />
+        {foto.texto && <figcaption>{foto.texto}</figcaption>}
+      </figure>
+    ))}
+  </div>
+</div>
+
+<style>
+  .carrusel {
+    overflow: hidden;
+    /* desvanecido en los bordes */
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .carrusel__pista {
+    display: flex;
+    gap: 1.25rem;
+    width: max-content;
+    animation: girar var(--carrusel-velocidad) linear infinite;
+  }
+  .carrusel:hover .carrusel__pista { animation-play-state: paused; }
+  @keyframes girar {
+    to { transform: translateX(calc(-50% - 0.625rem)); }
+  }
+  .carrusel__item {
+    position: relative;
+    flex-shrink: 0;
+    height: var(--carrusel-alto);
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radio-grande);
+    overflow: hidden;
+    box-shadow: var(--sombra);
+  }
+  .carrusel__item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.8s ease; }
+  .carrusel__item:hover img { transform: scale(1.06); }
+  .carrusel__item figcaption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 2.5rem 1.2rem 1.1rem;
+    background: linear-gradient(to top, rgba(6, 42, 31, 0.9), transparent);
+    color: var(--dorado-claro);
+    font-family: var(--fuente-titulos);
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+  }
+  @media (max-width: 600px) { .carrusel__item { height: 300px; } }
+  @media (prefers-reduced-motion: reduce) { .carrusel__pista { animation-duration: 160s; } }
+</style>

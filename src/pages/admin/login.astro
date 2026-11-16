@@ -1,0 +1,22 @@
+---
+// Inicio de sesión del administrador
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Logo from '../../components/Logo.astro';
+const error = Astro.url.searchParams.has('error');
+---
+<AdminLayout titulo="Iniciar sesión">
+  <main class="login">
+    <form class="login__caja" method="POST" action="/api/login">
+      <Logo tono="claro" tam="grande" />
+      <h1>Panel de administración</h1>
+      <p>Ingresa la contraseña para gestionar productos, carrusel y video.</p>
+      {error && <div class="alerta alerta--error">Contraseña incorrecta. Intenta de nuevo.</div>}
+      <label class="campo">
+        <span>Contraseña</span>
+        <input type="password" name="clave" required autofocus autocomplete="current-password" />
+      </label>
+      <button class="boton boton--dorado" type="submit">Ingresar</button>
+      <a href="/" class="login__volver">← Volver a la página</a>
+    </form>
+  </main>
+</AdminLayout>

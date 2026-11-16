@@ -1,0 +1,201 @@
+---
+// INDUCCIÓN Y BENEFICIOS
+// Los textos están en: src/data/induccion.js
+import GenteLayout from '../../layouts/GenteLayout.astro';
+import Encabezado from '../../components/Encabezado.astro';
+import Icono from '../../components/Icono.astro';
+import { cronogramaInduccion, beneficios, cargoAuxiliar as c, evaluaciones } from '../../data/induccion.js';
+---
+<GenteLayout
+  etiqueta="Bienvenida al equipo"
+  titulo="Inducción y beneficios"
+  texto="Hoy comienzas a ser parte de una marca que cree que la ropa debe adaptarse a las personas, y no al contrario."
+  imagen="/img/oficina.jpg"
+>
+  <!-- BENEFICIOS -->
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Beneficios y métodos de pago" titulo="Lo que ganas al ser parte de GENTAU" />
+      <div class="grid grid-3">
+        {beneficios.map((b) => (
+          <article class="tarjeta aparecer">
+            <span class="icono-circulo"><Icono nombre={b.icono} /></span>
+            <h3>{b.titulo}</h3>
+            <p>{b.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CRONOGRAMA DE INDUCCIÓN -->
+  <section class="seccion seccion--blanca">
+    <div class="contenedor">
+      <Encabezado etiqueta="Inducción general" titulo="Cronograma para nuevos colaboradores" texto={cronogramaInduccion.duracion} />
+      <div class="tabla-envoltura aparecer">
+        <table class="tabla">
+          <thead><tr><th>Hora</th><th>Duración</th><th>Tema / Actividad</th><th>Responsable</th></tr></thead>
+          <tbody>
+            {cronogramaInduccion.filas.map(([hora, duracion, tema, responsable]) => (
+              <tr class:list={{ descanso: tema === 'Descanso' }}>
+                <td class="hora">{hora}</td><td>{duracion}</td><td>{tema}</td><td>{responsable}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- INDUCCIÓN AL CARGO -->
+  <section class="seccion seccion--verde">
+    <div class="contenedor">
+      <Encabezado etiqueta="Inducción al cargo" titulo={c.cargo} texto={c.frase} />
+      <div class="proposito aparecer">
+        <span class="etiqueta">Propósito del cargo</span>
+        <p class="frase">{c.proposito}</p>
+      </div>
+      <div class="grid grid-3 mt-3">
+        {c.verbos.map((v) => (
+          <article class="tarjeta tarjeta--verde centrado aparecer">
+            <h3 class="verbo">{v.titulo}</h3>
+            <p>{v.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="La operación de GENTAU" titulo="Áreas que acompaña el cargo" />
+      <div class="grid grid-4">
+        {c.areas.map((a) => (
+          <article class="tarjeta aparecer"><h3>{a.titulo}</h3><p>{a.texto}</p></article>
+        ))}
+      </div>
+
+      <Encabezado etiqueta="Funciones" titulo="Responsabilidades principales" />
+      <div class="grid grid-2">
+        {c.responsabilidades.map((r) => (
+          <article class="tarjeta aparecer">
+            <h3>{r.titulo}</h3>
+            <ul class="lista-check mt-2">{r.items.map((i) => <li>{i}</li>)}</ul>
+            {r.nota && <p class="nota">{r.nota}</p>}
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion seccion--menta">
+    <div class="contenedor grid grid-2 limites">
+      <article class="tarjeta aparecer">
+        <h3 class="si"><Icono nombre="check" /> Puedes gestionar</h3>
+        <ul class="lista-check mt-2">{c.puedeGestionar.map((i) => <li>{i}</li>)}</ul>
+      </article>
+      <article class="tarjeta aparecer">
+        <h3 class="escalar"><Icono nombre="alerta" /> Debes escalar</h3>
+        <ul class="lista-check lista-escalar mt-2">{c.debeEscalar.map((i) => <li>{i}</li>)}</ul>
+      </article>
+      <article class="tarjeta aparecer">
+        <h3>Servicio interno</h3>
+        <p class="mt-2">Cada interacción debe reflejar respeto, escucha y profesionalismo.</p>
+        <ul class="lista-check mt-2">{c.servicio.map((i) => <li>{i}</li>)}</ul>
+      </article>
+      <article class="tarjeta aparecer">
+        <h3>Confidencialidad y responsabilidad</h3>
+        <ul class="lista-check mt-2">{c.confidencialidad.map((i) => <li>{i}</li>)}</ul>
+        <p class="nota">La información de las personas se trata con Reserva, Respeto y Responsabilidad.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Organización" titulo="Herramientas y rutina de gestión" />
+      <div class="grid grid-3">
+        {c.herramientas.map((h) => (
+          <article class="tarjeta aparecer"><h3>{h.titulo}</h3><p>{h.texto}</p></article>
+        ))}
+      </div>
+      <div class="rutina mt-3">
+        {c.rutina.map((r, i) => (
+          <div class="rutina__paso aparecer">
+            <span>{i + 1}</span>
+            <h3>{r.titulo}</h3>
+            <p>{r.texto}</p>
+          </div>
+        ))}
+      </div>
+
+      <Encabezado etiqueta="Tu primer mes" titulo="Plan de adaptación" />
+      <div class="linea-tiempo">
+        {c.planAdaptacion.map((p) => (
+          <div class="linea-tiempo__item aparecer"><strong>{p.dias}</strong><p>{p.texto}</p></div>
+        ))}
+      </div>
+
+      <div class="grid grid-2 mt-3">
+        <article class="tarjeta aparecer">
+          <h3>Resultados esperados</h3>
+          <ul class="lista-check mt-2">{c.resultados.map((i) => <li>{i}</li>)}</ul>
+        </article>
+        <article class="tarjeta tarjeta--verde aparecer">
+          <h3>Evaluaciones de inducción</h3>
+          {evaluaciones.map((e) => (
+            <div class="evaluacion"><strong>{e.titulo}</strong><p>{e.texto}</p></div>
+          ))}
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="cierre-induccion">
+    <div class="contenedor centrado">
+      <p class="frase">En Recursos Humanos, cada proceso representa una persona.</p>
+      <p class="mt-2">Gestiona con orden, empatía, compromiso y confidencialidad. Bienvenido(a) al equipo GENTAU.</p>
+    </div>
+  </section>
+</GenteLayout>
+
+<style>
+  .tabla .hora { font-weight: 600; color: var(--verde-oscuro); white-space: nowrap; }
+  .tabla .descanso td { background: #fbf6e6 !important; color: var(--dorado); font-style: italic; }
+
+  .proposito { max-width: 860px; margin: 0 auto; text-align: center; padding: 2.5rem; border-radius: var(--radio-grande); border: 1px solid rgba(232, 206, 115, 0.4); }
+  .proposito .frase { color: var(--blanco); }
+  .verbo { font-size: 1.5rem; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .nota { margin-top: 1.2rem; padding: 0.9rem 1.1rem; border-radius: 10px; background: var(--menta); font-size: 0.86rem; color: var(--verde); }
+  .tarjeta--verde .nota { background: rgba(255, 255, 255, 0.06); color: var(--dorado-claro); }
+  .grid + :global(.encabezado) { margin-top: 4rem; }
+
+  .limites h3 { display: flex; align-items: center; gap: 0.6rem; }
+  .si { color: var(--verde) !important; }
+  .escalar { color: #a6731a !important; }
+  .lista-escalar li::before { background-color: #e7c873; }
+
+  .rutina { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
+  .rutina__paso { position: relative; padding: 2rem; border-radius: var(--radio); background: var(--verde-oscuro); color: #c3d1c9; }
+  .rutina__paso span { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--degradado-dorado); color: var(--verde-noche); font-weight: 700; margin-bottom: 1rem; }
+  .rutina__paso h3 { color: var(--dorado-claro); margin-bottom: 0.5rem; }
+  @media (max-width: 760px) { .rutina { grid-template-columns: 1fr; } }
+
+  .linea-tiempo { display: grid; grid-template-columns: repeat(3, 1fr); position: relative; gap: 1.5rem; }
+  .linea-tiempo::before { content: ''; position: absolute; top: 22px; left: 5%; right: 5%; height: 2px; background: var(--dorado-suave); }
+  .linea-tiempo__item { position: relative; text-align: center; padding-top: 3.5rem; }
+  .linea-tiempo__item::before {
+    content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 22px; height: 22px; border-radius: 50%; background: var(--dorado); border: 4px solid var(--crema); box-shadow: 0 0 0 2px var(--dorado);
+  }
+  .linea-tiempo__item strong { font-family: var(--fuente-titulos); color: var(--verde-oscuro); font-size: 1.1rem; }
+  .linea-tiempo__item p { color: var(--texto-suave); font-size: 0.92rem; margin-top: 0.4rem; }
+  @media (max-width: 760px) { .linea-tiempo { grid-template-columns: 1fr; } .linea-tiempo::before { display: none; } }
+
+  .evaluacion { padding: 1rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+  .evaluacion strong { color: var(--blanco); }
+
+  .cierre-induccion { padding: var(--espacio-seccion) 0; background: var(--degradado-dorado); color: var(--verde-noche); }
+  .cierre-induccion .frase { color: var(--verde-noche); }
+</style>

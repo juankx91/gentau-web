@@ -1,0 +1,36 @@
+---
+// Menú secundario de la sección "Nuestra gente"
+import { menu } from '../config/site.js';
+const paginas = menu.find((m) => m.hijos)?.hijos ?? [];
+const ruta = Astro.url.pathname;
+---
+<nav class="subnav" aria-label="Secciones de Nuestra gente">
+  <div class="contenedor subnav__fila">
+    <a href="/nuestra-gente" class:list={{ activo: ruta === '/nuestra-gente' }}>Todo</a>
+    {paginas.map((p) => <a href={p.url} class:list={{ activo: ruta === p.url }}>{p.texto}</a>)}
+  </div>
+</nav>
+
+<style>
+  .subnav {
+    position: sticky;
+    top: 84px;
+    z-index: 50;
+    background: var(--blanco);
+    border-bottom: 1px solid var(--borde);
+    box-shadow: 0 6px 20px rgba(11, 61, 46, 0.05);
+  }
+  .subnav__fila { display: flex; gap: 0.4rem; overflow-x: auto; padding-block: 0.8rem; scrollbar-width: none; }
+  .subnav a {
+    white-space: nowrap;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+    border: 1px solid transparent;
+    transition: all var(--transicion);
+  }
+  .subnav a:hover { color: var(--verde-oscuro); border-color: var(--borde); }
+  .subnav a.activo { background: var(--verde-oscuro); color: var(--dorado-claro); }
+</style>

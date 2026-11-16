@@ -1,0 +1,20 @@
+---
+// Plantilla del panel de administrador (sin el menú público)
+import '../styles/global.css';
+import '../styles/admin.css';
+interface Props { titulo: string }
+const { titulo } = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{titulo} | Admin GENTAU</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="admin-body">
+    <slot />
+  </body>
+</html>

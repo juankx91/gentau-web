@@ -1,0 +1,65 @@
+---
+// "NUESTRA GENTE": página principal con acceso a todos los documentos de Talento Humano
+import GenteLayout from '../../layouts/GenteLayout.astro';
+import Encabezado from '../../components/Encabezado.astro';
+import Icono from '../../components/Icono.astro';
+
+const secciones = [
+  { url: '/nuestra-gente/bienestar', titulo: 'Plan de Bienestar 2027', texto: '“Juntos brillamos más”: 7 componentes, 21 actividades, cronograma, presupuesto e indicadores.', icono: 'corazon', imagen: '/img/bienestar-portada.jpg' },
+  { url: '/nuestra-gente/sst', titulo: 'Seguridad y Salud en el Trabajo', texto: 'Qué es la SST, accidentes e incidentes, enfermedades laborales y buenas prácticas.', icono: 'escudo', imagen: '/img/dotacion.jpg' },
+  { url: '/nuestra-gente/induccion', titulo: 'Inducción y beneficios', texto: 'Cronograma de inducción, beneficios para colaboradores e inducción al cargo.', icono: 'personas', imagen: '/img/oficina.jpg' },
+  { url: '/nuestra-gente/reglamento', titulo: 'Reglamento Interno de Trabajo', texto: '8 capítulos y 24 artículos: admisión, jornada, salarios, disciplina, SST y convivencia.', icono: 'balanza', imagen: '/img/logo-gentau.jpg' },
+  { url: '/nuestra-gente/politicas', titulo: 'Políticas y Procedimientos', texto: 'Inclusión, diseño, producción responsable, formación, comunicación y más.', icono: 'documento', imagen: '/img/disenadora.jpg' },
+  { url: '/nuestra-gente/manual-imagen', titulo: 'Manual de Imagen Corporativa', texto: 'Lineamientos de presentación personal para cada área de GENTAU.', icono: 'percha', imagen: '/img/perchero.jpg' },
+];
+---
+<GenteLayout
+  etiqueta="Talento humano"
+  titulo="Nuestra gente"
+  texto="En GENTAU cuidamos a cada colaborador como persona, no solo como trabajador. Aquí encuentras toda la información de nuestra gestión humana."
+  imagen="/img/bienestar-portada.jpg"
+>
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Documentos" titulo="Todo lo que necesitas saber" texto="Selecciona una sección para conocer cómo trabajamos, cómo nos cuidamos y cómo crecemos juntos." />
+      <div class="grid grid-3">
+        {secciones.map((s) => (
+          <a href={s.url} class="seccion-card aparecer">
+            <div class="seccion-card__img" style={`background-image:url('${s.imagen}')`}></div>
+            <div class="seccion-card__cuerpo">
+              <span class="icono-circulo"><Icono nombre={s.icono} /></span>
+              <h3>{s.titulo}</h3>
+              <p>{s.texto}</p>
+              <span class="seccion-card__ver">Ver sección <Icono nombre="flecha" tam={16} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</GenteLayout>
+
+<style>
+  .seccion-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--blanco);
+    border-radius: var(--radio);
+    overflow: hidden;
+    border: 1px solid var(--borde);
+    box-shadow: var(--sombra);
+    transition: transform var(--transicion), box-shadow var(--transicion);
+  }
+  .seccion-card:hover { transform: translateY(-6px); box-shadow: var(--sombra-fuerte); }
+  .seccion-card__img { height: 170px; background-size: cover; background-position: center; position: relative; }
+  .seccion-card__img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(6, 42, 31, 0.7), rgba(6, 42, 31, 0.15)); }
+  .seccion-card__cuerpo { position: relative; padding: 0 1.8rem 1.8rem; flex: 1; display: flex; flex-direction: column; }
+  .seccion-card__cuerpo .icono-circulo { margin-top: -29px; position: relative; z-index: 1; }
+  .seccion-card h3 { margin-bottom: 0.5rem; }
+  .seccion-card p { color: var(--texto-suave); font-size: 0.9rem; flex: 1; }
+  .seccion-card__ver {
+    display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.2rem;
+    font-size: 0.78rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dorado);
+  }
+  .seccion-card:hover .seccion-card__ver { color: var(--verde-oscuro); }
+</style>

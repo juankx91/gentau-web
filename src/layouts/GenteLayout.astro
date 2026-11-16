@@ -1,0 +1,15 @@
+---
+// Plantilla para las páginas de "Nuestra gente"
+// (encabezado + menú secundario + contenido)
+import BaseLayout from './BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SubnavGente from '../components/SubnavGente.astro';
+
+interface Props { titulo: string; etiqueta: string; texto?: string; imagen?: string }
+const { titulo, etiqueta, texto, imagen } = Astro.props;
+---
+<BaseLayout titulo={titulo} descripcion={texto}>
+  <PageHero etiqueta={etiqueta} titulo={titulo} texto={texto} imagen={imagen} />
+  <SubnavGente />
+  <slot />
+</BaseLayout>

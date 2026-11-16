@@ -1,0 +1,61 @@
+/* ============================================================
+   VARIABLES DE DISEÑO — GENTAU
+   Este es el archivo para cambiar colores, letras y tamaños.
+   Cambias un valor aquí y se actualiza en TODA la página.
+   ============================================================ */
+
+/* 1) FUENTES (Google Fonts)
+   Para cambiar una fuente:
+   - Búscala en https://fonts.google.com
+   - Reemplaza su nombre en este enlace y en las variables de abajo */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* 2) COLORES DE LA MARCA (tomados de las presentaciones) */
+  --verde-noche: #062a1f;      /* fondos muy oscuros (footer, hero) */
+  --verde-oscuro: #0b3d2e;     /* verde principal de GENTAU */
+  --verde: #1b5e44;            /* verde secundario */
+  --verde-claro: #dcebe0;      /* fondos suaves */
+  --menta: #eaf5ee;            /* fondos muy suaves */
+
+  --dorado: #c9a227;           /* dorado principal */
+  --dorado-claro: #e8ce73;     /* dorado brillante (textos sobre verde) */
+  --dorado-suave: #f2e3a8;     /* bordes y detalles */
+
+  --crema: #f8f4e8;            /* fondo general de la página */
+  --blanco: #ffffff;
+  --texto: #1f2b25;            /* color del texto normal */
+  --texto-suave: #4b5a52;      /* textos secundarios */
+  --borde: #e6dfc8;
+
+  /* Degradado dorado (botones y líneas decorativas) */
+  --degradado-dorado: linear-gradient(135deg, #b8901f 0%, #e8ce73 50%, #c9a227 100%);
+
+  /* 3) TIPOGRAFÍAS */
+  --fuente-titulos: 'Cinzel', Georgia, serif;          /* títulos (como el logo) */
+  --fuente-acento: 'Cormorant Garamond', Georgia, serif; /* frases en cursiva */
+  --fuente-texto: 'Montserrat', Arial, sans-serif;     /* texto normal */
+
+  /* 4) TAMAÑOS DE LETRA
+     clamp(mínimo, ideal, máximo) = se adapta solo al tamaño de pantalla */
+  --tam-hero: clamp(2.6rem, 7vw, 5.5rem);   /* título grande del inicio */
+  --tam-h1: clamp(2.1rem, 4.5vw, 3.4rem);   /* título de cada página */
+  --tam-h2: clamp(1.7rem, 3.2vw, 2.5rem);   /* títulos de secciones */
+  --tam-h3: clamp(1.1rem, 1.6vw, 1.3rem);   /* títulos de tarjetas */
+  --tam-texto: 1rem;                         /* texto normal (16px) */
+  --tam-pequeno: 0.875rem;                   /* textos pequeños */
+  --tam-etiqueta: 0.75rem;                   /* etiquetas en MAYÚSCULA */
+
+  /* 5) ESPACIOS Y FORMAS */
+  --ancho-maximo: 1200px;      /* ancho máximo del contenido */
+  --espacio-seccion: clamp(4rem, 8vw, 6.5rem); /* espacio arriba/abajo de cada sección */
+  --radio: 14px;               /* qué tan redondeadas son las esquinas */
+  --radio-grande: 24px;
+  --sombra: 0 10px 30px rgba(11, 61, 46, 0.08);
+  --sombra-fuerte: 0 20px 50px rgba(6, 42, 31, 0.18);
+  --transicion: 0.3s ease;
+
+  /* 6) CARRUSEL DEL INICIO */
+  --carrusel-alto: 380px;      /* alto de las fotos del carrusel */
+  --carrusel-velocidad: 45s;   /* más segundos = se mueve más lento */
+}

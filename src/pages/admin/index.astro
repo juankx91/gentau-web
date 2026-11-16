@@ -1,0 +1,207 @@
+---
+// PANEL DE ADMINISTRADOR
+// Aquí se gestionan: productos, fotos del carrusel y video del inicio.
+// La lógica de los botones está en: src/scripts/admin.js
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import Logo from '../../components/Logo.astro';
+import Icono from '../../components/Icono.astro';
+import { obtenerProductos, obtenerCarrusel, obtenerAjustes } from '../../lib/db.js';
+import { cloudinaryConfigurado, optimizar } from '../../lib/cloudinary.js';
+import { precioCOP } from '../../lib/formato.js';
+
+let productos = [], fotos = [], ajustes = {}, errorDb = '';
+try {
+  [productos, fotos, ajustes] = await Promise.all([obtenerProductos(), obtenerCarrusel(), obtenerAjustes()]);
+} catch (e) {
+  errorDb = e?.message || 'Error desconocido';
+}
+const categorias = ['Mujer', 'Hombre', 'Unisex', 'Accesorios', ...new Set(productos.map((p) => p.categoria))];
+---
+<AdminLayout titulo="Panel">
+  <header class="admin-barra">
+    <div class="contenedor admin-barra__fila">
+      <div class="admin-barra__titulo">
+        <a href="/admin"><Logo tono="claro" /></a>
+        <span>Panel de administración</span>
+      </div>
+      <div class="admin-barra__acciones">
+        <a href="/" target="_blank">Ver página</a>
+        <form method="POST" action="/api/logout"><button type="submit"><Icono nombre="salir" tam={16} /> Salir</button></form>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-main contenedor">
+    {errorDb && <div class="alerta alerta--error">No se pudo conectar con la base de datos: {errorDb}. Revisa TURSO_DATABASE_URL y TURSO_AUTH_TOKEN.</div>}
+    {!cloudinaryConfigurado && (
+      <div class="alerta alerta--aviso">
+        Cloudinary no está configurado: no podrás subir archivos desde tu computador, pero sí pegar el enlace (URL) de una imagen o video.
+        Agrega CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY y CLOUDINARY_API_SECRET.
+      </div>
+    )}
+
+    <nav class="admin-tabs" role="tablist">
+      <button class="admin-tab activa" data-tab="productos"><Icono nombre="bolsa" tam={18} /> Productos <span class="contador">{productos.length}</span></button>
+      <button class="admin-tab" data-tab="carrusel"><Icono nombre="imagen" tam={18} /> Carrusel <span class="contador">{fotos.length}</span></button>
+      <button class="admin-tab" data-tab="video"><Icono nombre="video" tam={18} /> Video del inicio</button>
+    </nav>
+
+    <!-- ================= PRODUCTOS ================= -->
+    <section class="admin-panel" data-panel="productos">
+      <div class="admin-columnas">
+        <form class="caja" id="form-producto" novalidate>
+          <h2 id="titulo-form">Nuevo producto</h2>
+          <p class="caja__ayuda">Completa los datos y guarda. Para editar, usa el lápiz en la lista.</p>
+          <input type="hidden" name="producto_id" />
+          <input type="hidden" name="imagen_url" />
+          <input type="hidden" name="imagen_id" />
+
+          <label class="campo"><span>Nombre *</span><input type="text" name="nombre" maxlength="120" required /></label>
+          <div class="fila-2">
+            <label class="campo"><span>Precio (COP) *</span><input type="number" name="precio" min="0" step="100" required /></label>
+            <label class="campo">
+              <span>Categoría</span>
+              <input type="text" name="categoria" list="lista-categorias" placeholder="Mujer" />
+              <datalist id="lista-categorias">{[...new Set(categorias)].map((c) => <option value={c} />)}</datalist>
+            </label>
+          </div>
+          <label class="campo"><span>Descripción</span><textarea name="descripcion" maxlength="2000"></textarea></label>
+
+          <div class="campo">
+            <span>Foto del producto</span>
+            <label class="subir">
+              <Icono nombre="imagen" tam={28} />
+              <strong>Haz clic para elegir una foto</strong>
+              <small>JPG, PNG o WEBP</small>
+              <input type="file" accept="image/*" id="archivo-producto" />
+            </label>
+            <small>…o pega el enlace de una imagen:</small>
+            <input type="url" id="url-producto" placeholder="https://..." />
+            <div class="vista-previa" id="previa-producto" hidden><img alt="Vista previa" /></div>
+            <button type="button" class="boton boton--borde" id="quitar-foto-producto" hidden style="margin-top:.6rem;padding:.5rem 1rem">Quitar foto</button>
+          </div>
+
+          <label class="campo campo--check"><input type="checkbox" name="destacado" /><span>Mostrar como destacado en el inicio</span></label>
+          <div class="progreso" id="progreso-producto" hidden><span></span></div>
+
+          <div class="botones-form">
+            <button type="submit" class="boton boton--verde" id="guardar-producto">Guardar producto</button>
+            <button type="button" class="boton boton--borde" id="cancelar-edicion" hidden>Cancelar</button>
+          </div>
+        </form>
+
+        <div class="caja">
+          <h2>Productos publicados</h2>
+          <p class="caja__ayuda">Los destacados aparecen primero y en la página de inicio.</p>
+          {productos.length === 0 ? (
+            <p class="vacio">Todavía no hay productos. ¡Agrega el primero!</p>
+          ) : (
+            <div class="admin-productos">
+              {productos.map((p) => (
+                <article class="admin-producto">
+                  {p.imagen_url
+                    ? <img class="admin-producto__img" src={optimizar(p.imagen_url, 200)} alt={p.nombre} />
+                    : <div class="admin-producto__img"><Icono nombre="percha" /></div>}
+                  <div>
+                    <h3>{p.nombre}</h3>
+                    <div class="admin-producto__meta">
+                      <strong>{precioCOP(p.precio)}</strong>
+                      <span class="chip">{p.categoria}</span>
+                      {Number(p.destacado) === 1 && <span class="chip chip--dorado">Destacado</span>}
+                    </div>
+                  </div>
+                  <div class="acciones">
+                    <button class="btn-icono" title="Editar" data-editar={JSON.stringify(p)}><Icono nombre="editar" tam={18} /></button>
+                    <button class="btn-icono btn-icono--peligro" title="Eliminar" data-eliminar-producto={p.id} data-nombre={p.nombre}><Icono nombre="basura" tam={18} /></button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CARRUSEL ================= -->
+    <section class="admin-panel" data-panel="carrusel" hidden>
+      <div class="admin-columnas">
+        <form class="caja" id="form-carrusel">
+          <h2>Agregar fotos al carrusel</h2>
+          <p class="caja__ayuda">Puedes elegir varias fotos a la vez. Recomendado: fotos verticales (3:4).</p>
+          <label class="subir">
+            <Icono nombre="imagen" tam={28} />
+            <strong>Elegir fotos</strong>
+            <small id="texto-archivos-carrusel">Ningún archivo seleccionado</small>
+            <input type="file" accept="image/*" multiple id="archivos-carrusel" />
+          </label>
+          <label class="campo" style="margin-top:1rem"><span>…o enlace de una imagen</span><input type="url" id="url-carrusel" placeholder="https://..." /></label>
+          <label class="campo"><span>Texto sobre la foto (opcional)</span><input type="text" id="texto-carrusel" maxlength="120" placeholder="Ej: Nueva colección" /></label>
+          <div class="progreso" id="progreso-carrusel" hidden><span></span></div>
+          <button type="submit" class="boton boton--verde" id="guardar-carrusel">Agregar al carrusel</button>
+        </form>
+
+        <div class="caja">
+          <h2>Fotos actuales</h2>
+          <p class="caja__ayuda">El número define el orden (1 aparece primero). {fotos.length === 0 && 'Mientras no subas fotos, se muestran fotos de ejemplo.'}</p>
+          {fotos.length === 0 ? (
+            <p class="vacio">No has subido fotos todavía.</p>
+          ) : (
+            <div class="admin-fotos">
+              {fotos.map((f) => (
+                <article class="admin-foto" data-foto={f.id}>
+                  <img src={optimizar(f.imagen_url, 400)} alt={f.texto || 'Foto del carrusel'} />
+                  <div class="admin-foto__datos">
+                    <input type="text" value={f.texto || ''} placeholder="Texto (opcional)" data-campo="texto" />
+                    <div class="admin-foto__fila">
+                      <input type="number" value={f.orden} min="0" title="Orden" data-campo="orden" />
+                      <button class="btn-icono" title="Guardar cambios" data-guardar-foto={f.id}><Icono nombre="check" tam={16} /></button>
+                      <button class="btn-icono btn-icono--peligro" title="Quitar" data-eliminar-foto={f.id}><Icono nombre="basura" tam={16} /></button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= VIDEO ================= -->
+    <section class="admin-panel" data-panel="video" hidden>
+      <div class="admin-columnas">
+        <form class="caja" id="form-video">
+          <h2>Video de fondo del inicio</h2>
+          <p class="caja__ayuda">Recomendado: MP4 horizontal, de 10 a 30 segundos y menos de 50 MB. Se reproduce sin sonido y en bucle.</p>
+          <input type="hidden" name="hero_video_url" value={ajustes.hero_video_url || ''} />
+          <input type="hidden" name="hero_video_id" value={ajustes.hero_video_id || ''} />
+          <label class="subir">
+            <Icono nombre="video" tam={28} />
+            <strong>Elegir video</strong>
+            <small id="texto-archivo-video">MP4 o WEBM</small>
+            <input type="file" accept="video/mp4,video/webm" id="archivo-video" />
+          </label>
+          <label class="campo" style="margin-top:1rem"><span>…o enlace del video</span><input type="url" id="url-video" placeholder="https://..." /></label>
+          <div class="progreso" id="progreso-video" hidden><span></span></div>
+          <div class="botones-form">
+            <button type="submit" class="boton boton--verde" id="guardar-video">Guardar video</button>
+            <button type="button" class="boton boton--borde" id="quitar-video">Usar video por defecto</button>
+          </div>
+        </form>
+
+        <div class="caja">
+          <h2>Video actual</h2>
+          <p class="caja__ayuda">
+            {ajustes.hero_video_url ? 'Este es el video que se ve en el inicio.' : 'Se está usando el archivo por defecto: public/videos/hero.mp4'}
+          </p>
+          <video src={ajustes.hero_video_url || '/videos/hero.mp4'} controls muted playsinline style="width:100%;border-radius:14px;background:#062a1f" poster="/img/boutique.jpg"></video>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</AdminLayout>
+
+<script>
+  import '../../scripts/admin.js';
+</script>

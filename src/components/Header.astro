@@ -1,0 +1,196 @@
+---
+// Barra de navegación superior.
+// transparente = true → empieza transparente sobre el video del inicio
+// y se vuelve verde al bajar.
+import Logo from './Logo.astro';
+import Icono from './Icono.astro';
+import { menu } from '../config/site.js';
+
+interface Props { transparente?: boolean }
+const { transparente = false } = Astro.props;
+const rutaActual = Astro.url.pathname;
+const activo = (url: string) => (url === '/' ? rutaActual === '/' : rutaActual.startsWith(url));
+---
+<header class:list={['header', { 'header--transparente': transparente }]} data-header>
+  <div class="contenedor header__fila">
+    <a href="/" aria-label="GENTAU - Inicio"><Logo tono="claro" /></a>
+
+    <button class="header__boton-menu" aria-label="Abrir menú" aria-expanded="false" data-boton-menu>
+      <Icono nombre="menu" tam={28} />
+    </button>
+
+    <nav class="nav" data-nav>
+      <ul class="nav__lista">
+        {menu.map((item) => (
+          <li class:list={['nav__item', { 'nav__item--padre': item.hijos }]}>
+            <a href={item.url} class:list={['nav__enlace', { activo: activo(item.url) }]}>
+              {item.texto}
+              {item.hijos && <span class="nav__flecha" aria-hidden="true">▾</span>}
+            </a>
+            {item.hijos && (
+              <ul class="submenu">
+                {item.hijos.map((hijo) => (
+                  <li><a href={hijo.url} class:list={{ activo: rutaActual === hijo.url }}>{hijo.texto}</a></li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+      <a href="/productos" class="boton boton--dorado nav__cta">Ver colección</a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector('[data-header]');
+  const boton = document.querySelector('[data-boton-menu]');
+  const nav = document.querySelector('[data-nav]');
+
+  // Cambia el fondo del header al hacer scroll
+  const revisarScroll = () => header?.classList.toggle('header--scroll', window.scrollY > 40);
+  revisarScroll();
+  window.addEventListener('scroll', revisarScroll, { passive: true });
+
+  // Menú en celular
+  boton?.addEventListener('click', () => {
+    const abierto = nav?.classList.toggle('nav--abierto');
+    boton.setAttribute('aria-expanded', String(abierto));
+    document.body.style.overflow = abierto ? 'hidden' : '';
+  });
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--verde-noche);
+    border-bottom: 1px solid rgba(232, 206, 115, 0.18);
+    transition: background var(--transicion), box-shadow var(--transicion), padding var(--transicion);
+  }
+  .header--transparente {
+    position: fixed;
+    inset: 0 0 auto 0;
+    background: linear-gradient(to bottom, rgba(6, 42, 31, 0.75), transparent);
+    border-bottom-color: transparent;
+  }
+  .header--scroll {
+    background: rgba(6, 42, 31, 0.97);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+    border-bottom-color: rgba(232, 206, 115, 0.18);
+  }
+  .header__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 84px;
+  }
+
+  .nav { display: flex; align-items: center; gap: 2rem; }
+  .nav__lista { display: flex; align-items: center; gap: 0.4rem; }
+  .nav__item { position: relative; }
+  .nav__enlace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 0.9rem;
+    color: #e9efe9;
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    position: relative;
+  }
+  .nav__enlace::after {
+    content: '';
+    position: absolute;
+    left: 0.9rem;
+    right: 0.9rem;
+    bottom: 0.3rem;
+    height: 1px;
+    background: var(--dorado-claro);
+    transform: scaleX(0);
+    transition: transform var(--transicion);
+  }
+  .nav__enlace:hover,
+  .nav__enlace.activo { color: var(--dorado-claro); }
+  .nav__enlace:hover::after,
+  .nav__enlace.activo::after { transform: scaleX(1); }
+  .nav__flecha { font-size: 0.7rem; }
+  .nav__cta { padding: 0.75rem 1.4rem; font-size: 0.72rem; }
+
+  /* Submenú desplegable */
+  .submenu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    min-width: 270px;
+    padding: 0.75rem;
+    background: var(--blanco);
+    border-radius: var(--radio);
+    border-top: 3px solid var(--dorado);
+    box-shadow: var(--sombra-fuerte);
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 10px);
+    transition: all var(--transicion);
+  }
+  .nav__item--padre:hover .submenu,
+  .nav__item--padre:focus-within .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+  }
+  .submenu a {
+    display: block;
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    color: var(--texto);
+  }
+  .submenu a:hover,
+  .submenu a.activo { background: var(--menta); color: var(--verde-oscuro); }
+
+  .header__boton-menu {
+    display: none;
+    background: none;
+    border: 0;
+    color: var(--dorado-claro);
+    cursor: pointer;
+  }
+
+  /* ---- Celular y tablet ---- */
+  @media (max-width: 1020px) {
+    .header__boton-menu { display: block; z-index: 2; }
+    .nav {
+      position: fixed;
+      inset: 84px 0 0 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1.5rem;
+      padding: 1.5rem 1.5rem 3rem;
+      background: var(--verde-noche);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.35s ease;
+    }
+    .nav--abierto { transform: none; }
+    .nav__lista { flex-direction: column; align-items: stretch; gap: 0; }
+    .nav__enlace { padding: 1rem 0; font-size: 0.95rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); width: 100%; }
+    .nav__enlace::after { display: none; }
+    .submenu {
+      position: static;
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      background: transparent;
+      box-shadow: none;
+      border: 0;
+      padding: 0.25rem 0 0.75rem 1rem;
+    }
+    .submenu a { color: #c3d1c9; }
+    .submenu a:hover, .submenu a.activo { background: rgba(255, 255, 255, 0.06); color: var(--dorado-claro); }
+  }
+</style>

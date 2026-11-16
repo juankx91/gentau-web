@@ -1,0 +1,10 @@
+---
+// Título de sección: etiqueta pequeña + título + texto opcional
+interface Props { etiqueta?: string; titulo: string; texto?: string; izquierda?: boolean }
+const { etiqueta, titulo, texto, izquierda = false } = Astro.props;
+---
+<div class:list={['encabezado', 'aparecer', { 'encabezado--izq': izquierda }]}>
+  {etiqueta && <span class="etiqueta">{etiqueta}</span>}
+  <h2>{titulo}</h2>
+  {texto && <p>{texto}</p>}
+</div>

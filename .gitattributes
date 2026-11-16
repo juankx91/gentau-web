@@ -1,0 +1,5 @@
+# Mantiene los saltos de línea iguales en Windows, Mac y Linux
+* text=auto eol=lf
+*.jpg binary
+*.png binary
+*.mp4 binary

@@ -1,0 +1,42 @@
+---
+// Encabezado grande de las páginas internas (Nosotros, Productos, etc.)
+interface Props { etiqueta: string; titulo: string; texto?: string; imagen?: string }
+const { etiqueta, titulo, texto, imagen } = Astro.props;
+---
+<section class="page-hero" style={imagen ? `--fondo: url('${imagen}')` : ''}>
+  <div class="contenedor page-hero__contenido">
+    <span class="etiqueta">{etiqueta}</span>
+    <h1>{titulo}</h1>
+    {texto && <p>{texto}</p>}
+    <div class="linea-dorada"></div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    padding: clamp(5rem, 11vw, 8rem) 0 clamp(4rem, 8vw, 6rem);
+    text-align: center;
+    color: #dfe8e2;
+    background:
+      linear-gradient(160deg, rgba(11, 61, 46, 0.93), rgba(6, 42, 31, 0.97)),
+      var(--fondo, none) center / cover;
+    overflow: hidden;
+  }
+  /* Curvas doradas decorativas (como en las presentaciones) */
+  .page-hero::before,
+  .page-hero::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(232, 206, 115, 0.45);
+    pointer-events: none;
+  }
+  .page-hero::before { width: 900px; height: 900px; right: -520px; top: -560px; }
+  .page-hero::after { width: 700px; height: 700px; left: -460px; bottom: -560px; border-color: rgba(232, 206, 115, 0.3); }
+  .page-hero__contenido { position: relative; max-width: 820px; }
+  .page-hero .etiqueta { color: var(--dorado-claro); }
+  .page-hero .etiqueta::before, .page-hero .etiqueta::after { background: var(--dorado-claro); }
+  .page-hero h1 { color: var(--blanco); }
+  .page-hero p { margin-top: 1.2rem; font-size: 1.08rem; color: #c9d6cf; }
+</style>

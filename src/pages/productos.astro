@@ -1,0 +1,101 @@
+---
+// PÁGINA DE PRODUCTOS
+// Los productos se agregan/editan/eliminan desde el panel /admin
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
+import { obtenerProductos } from '../lib/db.js';
+
+let productos = [];
+try {
+  productos = await obtenerProductos();
+} catch (error) {
+  console.error('Error cargando productos:', error);
+}
+const categorias = [...new Set(productos.map((p) => p.categoria))].sort();
+---
+<BaseLayout titulo="Productos" descripcion="Colección GENTAU: prendas de diseño propio para todos los cuerpos.">
+  <PageHero etiqueta="Colección" titulo="Nuestros productos" texto="Prendas propias, pensadas desde la inclusión real de tallas y siluetas." imagen="/img/perchero.jpg" />
+
+  <section class="seccion">
+    <div class="contenedor">
+      <div class="filtros">
+        <div class="filtros__botones" role="group" aria-label="Filtrar por categoría">
+          <button class="filtro activo" data-filtro="todos">Todos</button>
+          {categorias.map((c) => <button class="filtro" data-filtro={c}>{c}</button>)}
+        </div>
+        <input type="search" class="buscador" placeholder="Buscar prenda..." aria-label="Buscar prenda" data-buscador />
+      </div>
+
+      {productos.length > 0 ? (
+        <div class="grid grid-3" data-lista>
+          {productos.map((p) => <TarjetaProducto producto={p} />)}
+        </div>
+      ) : (
+        <p class="centrado texto-suave">Aún no hay productos publicados.</p>
+      )}
+      <p class="centrado texto-suave mt-3" data-vacio hidden>No encontramos prendas con ese filtro.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Filtro por categoría y buscador (funciona en el navegador)
+  const botones = document.querySelectorAll<HTMLButtonElement>('[data-filtro]');
+  const buscador = document.querySelector<HTMLInputElement>('[data-buscador]');
+  const tarjetas = document.querySelectorAll<HTMLElement>('[data-lista] > article');
+  const vacio = document.querySelector<HTMLElement>('[data-vacio]');
+  let categoria = 'todos';
+
+  function filtrar() {
+    const texto = (buscador?.value || '').toLowerCase().trim();
+    let visibles = 0;
+    tarjetas.forEach((t) => {
+      const okCategoria = categoria === 'todos' || t.dataset.categoria === categoria;
+      const okTexto = !texto || t.textContent?.toLowerCase().includes(texto);
+      const mostrar = okCategoria && okTexto;
+      t.hidden = !mostrar;
+      if (mostrar) visibles++;
+    });
+    if (vacio) vacio.hidden = visibles > 0 || tarjetas.length === 0;
+  }
+
+  botones.forEach((b) =>
+    b.addEventListener('click', () => {
+      botones.forEach((x) => x.classList.remove('activo'));
+      b.classList.add('activo');
+      categoria = b.dataset.filtro || 'todos';
+      filtrar();
+    })
+  );
+  buscador?.addEventListener('input', filtrar);
+</script>
+
+<style>
+  .filtros { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 2.5rem; }
+  .filtros__botones { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .filtro {
+    padding: 0.6rem 1.3rem;
+    border-radius: 999px;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    color: var(--texto-suave);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all var(--transicion);
+  }
+  .filtro:hover { border-color: var(--dorado); color: var(--verde-oscuro); }
+  .filtro.activo { background: var(--verde-oscuro); border-color: var(--verde-oscuro); color: var(--dorado-claro); }
+  .buscador {
+    min-width: 260px;
+    padding: 0.7rem 1.2rem;
+    border-radius: 999px;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    outline: none;
+  }
+  .buscador:focus { border-color: var(--dorado); box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.15); }
+  [hidden] { display: none !important; }
+</style>

@@ -1,0 +1,123 @@
+---
+// SEGURIDAD Y SALUD EN EL TRABAJO
+// Los textos están en: src/data/sst.js
+import GenteLayout from '../../layouts/GenteLayout.astro';
+import Encabezado from '../../components/Encabezado.astro';
+import Icono from '../../components/Icono.astro';
+import { sst } from '../../data/sst.js';
+---
+<GenteLayout etiqueta="Inducción SST" titulo="Seguridad y Salud en el Trabajo" texto={sst.intro} imagen="/img/dotacion.jpg">
+  <!-- QUÉ ES -->
+  <section class="seccion">
+    <div class="contenedor dos-columnas">
+      <div class="aparecer">
+        <span class="etiqueta">Conceptos básicos</span>
+        <h2>¿Qué es la SST?</h2>
+        <p class="texto-suave mt-2">{sst.queEs}</p>
+        <p class="texto-suave mt-2">{sst.aplica}</p>
+        <div class="objetivo-sst"><Icono nombre="corazon" tam={26} /><span>{sst.objetivo}</span></div>
+      </div>
+      <div class="tarjeta tarjeta--verde aparecer">
+        <h3>La SST busca</h3>
+        <ul class="busca">
+          {sst.busca.map((item) => <li><Icono nombre="check" tam={18} /> {item}</li>)}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCIDENTE VS INCIDENTE -->
+  <section class="seccion seccion--blanca">
+    <div class="contenedor">
+      <Encabezado etiqueta="Aprende a diferenciarlos" titulo="Accidente e incidente: ¿cuál es la diferencia?" />
+      <div class="grid grid-2">
+        <article class="comparacion comparacion--accidente aparecer">
+          <span class="icono-circulo"><Icono nombre="alerta" /></span>
+          <h3>¿Qué es un accidente?</h3>
+          <p>{sst.accidente.definicion}</p>
+          <div class="ejemplo"><strong>Ejemplo</strong>{sst.accidente.ejemplo}</div>
+        </article>
+        <article class="comparacion aparecer">
+          <span class="icono-circulo"><Icono nombre="ojo" /></span>
+          <h3>¿Qué es un incidente?</h3>
+          <p>{sst.incidente.definicion}</p>
+          <div class="ejemplo"><strong>Ejemplo</strong>{sst.incidente.ejemplo}</div>
+        </article>
+      </div>
+      <p class="nota-dorada aparecer">{sst.notaReporte}</p>
+    </div>
+  </section>
+
+  <!-- ENFERMEDADES -->
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Prevención" titulo="¿Qué son las enfermedades laborales?" texto={sst.enfermedades.definicion} />
+      <div class="grid grid-4">
+        {sst.enfermedades.lista.map((e) => (
+          <article class="tarjeta aparecer">
+            <span class="icono-circulo"><Icono nombre={e.icono} /></span>
+            <h3>{e.titulo}</h3>
+            <p>{e.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- BUENAS PRÁCTICAS -->
+  <section class="seccion seccion--verde">
+    <div class="contenedor">
+      <Encabezado etiqueta="Autocuidado" titulo="Buenas prácticas que debemos seguir" />
+      <div class="grid grid-3">
+        {sst.buenasPracticas.map((p) => (
+          <article class="tarjeta tarjeta--verde aparecer">
+            <span class="icono-circulo"><Icono nombre={p.icono} /></span>
+            <h3>{p.titulo}</h3>
+            <p>{p.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- SISTEMA DE GESTIÓN -->
+  <section class="seccion">
+    <div class="contenedor">
+      <Encabezado etiqueta="Cómo nos organizamos" titulo="Sistema de gestión SST en GENTAU" />
+      <div class="grid grid-3">
+        {sst.sistema.map((s, i) => (
+          <article class="tarjeta aparecer">
+            <span class="paso">0{i + 1}</span>
+            <h3>{s.titulo}</h3>
+            <p>{s.texto}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</GenteLayout>
+
+<style>
+  .objetivo-sst {
+    display: flex; align-items: center; gap: 1rem; margin-top: 2rem;
+    padding: 1.3rem 1.5rem; border-radius: var(--radio);
+    background: var(--verde-oscuro); color: var(--dorado-claro);
+    font-family: var(--fuente-acento); font-style: italic; font-size: 1.3rem;
+  }
+  .objetivo-sst :global(svg) { flex-shrink: 0; }
+  .busca li { display: flex; gap: 0.8rem; align-items: flex-start; padding: 0.9rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); color: #e1e9e4; }
+  .busca :global(svg) { color: var(--dorado-claro); flex-shrink: 0; margin-top: 3px; }
+
+  .comparacion { padding: 2.5rem; border-radius: var(--radio-grande); background: var(--menta); border: 1px solid var(--verde-claro); }
+  .comparacion--accidente { background: #fbf6e6; border-color: var(--dorado-suave); }
+  .comparacion h3 { margin-bottom: 0.8rem; }
+  .comparacion p { color: var(--texto-suave); }
+  .ejemplo { margin-top: 1.5rem; padding: 1rem 1.2rem; background: var(--blanco); border-radius: var(--radio); font-size: 0.92rem; color: var(--texto-suave); }
+  .ejemplo strong { display: block; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--dorado); margin-bottom: 0.3rem; }
+  .nota-dorada {
+    margin: 2.5rem auto 0; max-width: 700px; text-align: center;
+    padding: 1rem 1.5rem; border-radius: 999px;
+    background: var(--degradado-dorado); color: var(--verde-noche); font-weight: 600;
+  }
+  .paso { display: block; font-family: var(--fuente-titulos); font-size: 2.2rem; color: var(--dorado); line-height: 1; margin-bottom: 1rem; }
+</style>

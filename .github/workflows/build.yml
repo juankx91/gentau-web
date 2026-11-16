@@ -1,0 +1,21 @@
+# Revisión automática: cada vez que subes cambios a GitHub,
+# se comprueba que la página compile sin errores.
+# Si algo falla, verás una ❌ roja en tu repositorio (pestaña "Actions").
+name: Revisar que compile
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build

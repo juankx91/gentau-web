@@ -1,0 +1,137 @@
+---
+// Hero del inicio con video de fondo.
+// El video se cambia desde el panel admin (pestaña "Video del inicio").
+// Si no hay video en el admin, usa el archivo: public/videos/hero.mp4
+import Icono from './Icono.astro';
+import { site } from '../config/site.js';
+
+interface Props { video?: string }
+const { video } = Astro.props;
+const fuenteVideo = video || '/videos/hero.mp4';
+---
+<section class="hero">
+  <video class="hero__video" autoplay muted loop playsinline preload="auto" poster="/img/boutique.jpg">
+    <source src={fuenteVideo} type="video/mp4" />
+  </video>
+  <div class="hero__capa" aria-hidden="true"></div>
+  <div class="hero__curva hero__curva--1" aria-hidden="true"></div>
+  <div class="hero__curva hero__curva--2" aria-hidden="true"></div>
+
+  <div class="contenedor hero__contenido">
+    <span class="hero__etiqueta">Marca colombiana · Diseño propio</span>
+    <h1 class="hero__titulo">
+      Moda <em>sin barreras</em>
+    </h1>
+    <p class="hero__texto">
+      Prendas pensadas para todos los cuerpos, edades y estilos. {site.lema}
+    </p>
+    <div class="hero__botones">
+      <a href="/productos" class="boton boton--dorado">Ver colección <Icono nombre="flecha" tam={18} /></a>
+      <a href="/nosotros" class="boton boton--borde-claro">Conócenos</a>
+    </div>
+  </div>
+
+  <a href="#descubre" class="hero__bajar" aria-label="Bajar">
+    <span></span>
+  </a>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background: var(--verde-noche);
+    color: var(--blanco);
+  }
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Capa oscura sobre el video para que el texto se lea bien.
+     Sube o baja los números (0.85, 0.55...) para oscurecer o aclarar. */
+  .hero__capa {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(6, 42, 31, 0.88) 0%, rgba(6, 42, 31, 0.55) 55%, rgba(6, 42, 31, 0.3) 100%),
+      linear-gradient(to top, rgba(6, 42, 31, 0.85), transparent 40%);
+  }
+  .hero__curva {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid rgba(232, 206, 115, 0.5);
+    pointer-events: none;
+  }
+  .hero__curva--1 { width: 1100px; height: 1100px; right: -700px; top: -620px; }
+  .hero__curva--2 { width: 900px; height: 900px; right: -620px; bottom: -700px; border-color: rgba(232, 206, 115, 0.3); }
+
+  .hero__contenido { position: relative; padding-top: 6rem; max-width: var(--ancho-maximo); }
+  .hero__etiqueta {
+    display: inline-block;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid rgba(232, 206, 115, 0.6);
+    border-radius: 999px;
+    font-size: var(--tam-etiqueta);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--dorado-claro);
+    backdrop-filter: blur(4px);
+  }
+  .hero__titulo {
+    font-size: var(--tam-hero);
+    color: var(--blanco);
+    margin: 1.6rem 0 1.4rem;
+    max-width: 12ch;
+    line-height: 1.05;
+    text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  }
+  .hero__titulo em {
+    display: block;
+    font-family: var(--fuente-acento);
+    font-style: italic;
+    font-weight: 500;
+    background: var(--degradado-dorado);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero__texto { max-width: 520px; font-size: 1.12rem; color: #d7e2dc; font-weight: 300; }
+  .hero__botones { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 2.4rem; }
+
+  .hero__bajar {
+    position: absolute;
+    left: 50%;
+    bottom: 2rem;
+    transform: translateX(-50%);
+    width: 28px;
+    height: 46px;
+    border: 2px solid rgba(232, 206, 115, 0.7);
+    border-radius: 20px;
+  }
+  .hero__bajar span {
+    position: absolute;
+    left: 50%;
+    top: 8px;
+    width: 4px;
+    height: 8px;
+    margin-left: -2px;
+    border-radius: 4px;
+    background: var(--dorado-claro);
+    animation: bajar 1.8s infinite;
+  }
+  @keyframes bajar { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(16px); } }
+
+  /* Animación de entrada del texto */
+  .hero__contenido > * { animation: entrar 1s ease both; }
+  .hero__contenido > :nth-child(2) { animation-delay: 0.15s; }
+  .hero__contenido > :nth-child(3) { animation-delay: 0.3s; }
+  .hero__contenido > :nth-child(4) { animation-delay: 0.45s; }
+  @keyframes entrar { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+</style>

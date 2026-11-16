@@ -1,0 +1,68 @@
+---
+// REGLAMENTO INTERNO DE TRABAJO
+// Los textos están en: src/data/reglamento.js
+import GenteLayout from '../../layouts/GenteLayout.astro';
+import Icono from '../../components/Icono.astro';
+import { reglamento } from '../../data/reglamento.js';
+
+const totalArticulos = reglamento.reduce((s, c) => s + c.articulos.length, 0);
+---
+<GenteLayout
+  etiqueta="Documento de inducción"
+  titulo="Reglamento Interno de Trabajo"
+  texto="Condiciones de admisión, jornada, salarios, obligaciones, régimen disciplinario, seguridad y salud en el trabajo."
+  imagen="/img/logo-gentau.jpg"
+>
+  <section class="seccion">
+    <div class="contenedor reglamento">
+      <aside class="indice">
+        <div class="indice__caja">
+          <span class="etiqueta">Contenido</span>
+          <p class="indice__resumen">{reglamento.length} capítulos · {totalArticulos} artículos</p>
+          <ol>
+            {reglamento.map((cap, i) => (
+              <li><a href={`#capitulo-${i + 1}`}>{cap.capitulo.split('—')[1]?.trim() ?? cap.capitulo}</a></li>
+            ))}
+          </ol>
+        </div>
+      </aside>
+
+      <div>
+        {reglamento.map((cap, i) => (
+          <div class="capitulo" id={`capitulo-${i + 1}`}>
+            <h2 class="capitulo__titulo"><Icono nombre="documento" tam={22} /> {cap.capitulo}</h2>
+            {cap.articulos.map((art, j) => (
+              <details class="acordeon" open={i === 0 && j === 0}>
+                <summary>{art.titulo}</summary>
+                <div class="acordeon__contenido">
+                  {art.texto && <p class="texto-suave">{art.texto}</p>}
+                  {art.lista && <ul class="lista-check">{art.lista.map((li) => <li>{li}</li>)}</ul>}
+                </div>
+              </details>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</GenteLayout>
+
+<style>
+  .reglamento { display: grid; grid-template-columns: 290px 1fr; gap: 3rem; align-items: start; }
+  .indice { position: sticky; top: 160px; }
+  .indice__caja { padding: 1.8rem; border-radius: var(--radio); background: var(--verde-oscuro); color: #c3d1c9; box-shadow: var(--sombra-fuerte); }
+  .indice .etiqueta { color: var(--dorado-claro); }
+  .indice .etiqueta::before { display: none; }
+  .indice__resumen { font-size: 0.82rem; margin-bottom: 1rem; }
+  .indice ol { padding-left: 1.2rem; list-style: decimal; }
+  .indice li { margin-bottom: 0.6rem; font-size: 0.9rem; }
+  .indice li::marker { color: var(--dorado); }
+  .indice a:hover { color: var(--dorado-claro); }
+  .capitulo { margin-bottom: 3rem; scroll-margin-top: 160px; }
+  .capitulo__titulo { display: flex; align-items: center; gap: 0.7rem; font-size: 1.35rem; margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--dorado-suave); }
+  .capitulo__titulo :global(svg) { color: var(--dorado); flex-shrink: 0; }
+  @media (max-width: 900px) {
+    .reglamento { grid-template-columns: 1fr; }
+    .indice { position: static; }
+  }
+</style>
