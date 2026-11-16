@@ -1,0 +1,26 @@
+---
+// Una fila del plan de mejora. Se usa para las filas iniciales y como plantilla
+// para "Agregar fila" (en la plantilla, n = "__N__" y el script lo reemplaza).
+interface Columna { id: string; titulo: string; tipo: 'textarea' | 'date' }
+interface Props { n: number | string; columnas: Columna[]; quitable?: boolean }
+const { n, columnas, quitable = false } = Astro.props;
+---
+<tr data-fila-plan data-agregada={quitable ? '' : undefined}>
+  {columnas.map((c) => (
+    <td>
+      <label class="ev-etiqueta ev-etiqueta-movil" for={`plan-${c.id}-${n}`}>
+        {c.titulo}<span class="oculto-visual">, compromiso {n}</span>
+      </label>
+      {c.tipo === 'date' ? (
+        <input type="date" id={`plan-${c.id}-${n}`} name={`plan-${c.id}-${n}`} class="ev-control ev-vacio" />
+      ) : (
+        <textarea id={`plan-${c.id}-${n}`} name={`plan-${c.id}-${n}`} class="ev-control" rows="2" data-autoalto></textarea>
+      )}
+    </td>
+  ))}
+  <td class:list={['ev-plan__quitar', 'ev-no-imprimir', { 'ev-plan__quitar--vacia': !quitable }]}>
+    {quitable && (
+      <button type="button" class="ev-plan__boton-quitar" data-quitar-fila aria-label={`Quitar compromiso ${n}`}>×</button>
+    )}
+  </td>
+</tr>

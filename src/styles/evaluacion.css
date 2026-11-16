@@ -1,0 +1,163 @@
+/* ============================================================
+   FORMATO DE EVALUACIÓN DE DESEMPEÑO — estilos compartidos
+   Solo se carga en /nuestra-gente/evaluacion-desempeno.
+   Colores y medidas: variables.css (secciones 7 y 8).
+   Cada componente (src/components/evaluacion/) tiene además sus propios estilos.
+   ============================================================ */
+
+/* ---------- Hoja del formato ---------- */
+.ev-documento {
+  max-width: 1080px;
+  margin-inline: auto;
+  padding: var(--formacion-espacio-tarjeta);
+  background: var(--blanco);
+  border: 1px solid var(--borde);
+  border-top: 5px solid var(--dorado);
+  border-radius: var(--radio-grande);
+  box-shadow: var(--sombra);
+}
+.ev-documento :focus-visible { outline: var(--formacion-foco); outline-offset: 2px; }
+
+/* ---------- Campos ---------- */
+.ev-etiqueta {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: var(--tam-pequeno);
+  font-weight: 600;
+  color: var(--verde-oscuro);
+}
+.ev-control {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--evaluacion-campo-borde);
+  border-radius: var(--evaluacion-campo-radio);
+  background: var(--evaluacion-campo-fondo);
+  color: var(--texto);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: border-color var(--transicion), box-shadow var(--transicion);
+}
+.ev-control::placeholder { color: var(--texto-suave); opacity: 0.75; }
+.ev-control:focus {
+  outline: 2px solid transparent; /* visible en modo de alto contraste */
+  border-color: var(--evaluacion-campo-borde-foco);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.3);
+}
+textarea.ev-control { min-height: 4.5rem; resize: vertical; overflow: hidden; }
+
+/* Copia de cada cuadro de texto que solo se ve al imprimir:
+   así el texto largo sale completo, sin cortes (la crea src/scripts/evaluacion.js) */
+.ev-espejo { display: none; }
+
+/* Etiqueta que se ve solo en celular/tablet (en escritorio la columna de la tabla ya la nombra) */
+@media (min-width: 1000px), print {
+  .ev-etiqueta-movil {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* ---------- Grupo de opciones tipo "pastilla" (tipo de evaluación, resultado general) ---------- */
+.ev-pastillas { display: flex; flex-wrap: wrap; gap: 0.5rem; border: 0; }
+.ev-pastillas legend { margin-bottom: 0.5rem; }
+.ev-pastilla { position: relative; }
+.ev-pastilla input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.ev-pastilla span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--evaluacion-opcion-tam);
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--evaluacion-campo-borde);
+  border-radius: var(--formacion-radio-pastilla);
+  background: var(--evaluacion-opcion-fondo);
+  color: var(--texto);
+  font-size: var(--tam-pequeno);
+  font-weight: 500;
+  transition: background var(--transicion), color var(--transicion), border-color var(--transicion);
+}
+/* Casilla que se ve como ☐ / ☑ (útil también al imprimir) */
+.ev-pastilla span::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ev-pastilla:hover span { border-color: var(--dorado); }
+.ev-pastilla input:checked + span {
+  background: var(--evaluacion-opcion-activa);
+  border-color: var(--evaluacion-opcion-activa);
+  color: var(--evaluacion-opcion-activa-texto);
+}
+.ev-pastilla input:checked + span::before { background: currentColor; box-shadow: inset 0 0 0 2px var(--evaluacion-opcion-activa); }
+.ev-pastilla input:focus-visible + span { outline: var(--formacion-foco); outline-offset: 2px; }
+
+/* ---------- Solo pantalla / solo impresión ---------- */
+.solo-impresion { display: none; }
+
+/* ============================================================
+   IMPRESIÓN (A4) — el formulario se ve como documento formal
+   ============================================================ */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 12mm 14mm; /* márgenes de la hoja */
+  }
+
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { background: var(--blanco) !important; font-size: var(--evaluacion-impresion-letra); }
+
+  /* Fuera: menú, pie de página, encabezado de la página, información y botones */
+  .header, .footer, .subnav, .page-hero, .ev-no-imprimir { display: none !important; }
+  main > .seccion, .ev-formulario { padding: 0 !important; background: none !important; }
+  .aparecer { opacity: 1 !important; transform: none !important; }
+
+  .solo-impresion { display: block; }
+
+  .ev-documento {
+    max-width: none;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  /* Campos como líneas de un formato impreso */
+  .ev-control {
+    padding: 1px 2px;
+    border: 0;
+    border-bottom: 1px solid var(--evaluacion-impresion-linea);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: inherit;
+  }
+  /* El cuadro de texto se reemplaza por su copia, que crece con todo el contenido */
+  textarea.ev-control { display: none !important; }
+  .ev-espejo {
+    display: block;
+    min-height: 2.6em;
+    padding: 3px 5px;
+    border: 1px solid var(--evaluacion-impresion-linea);
+    border-radius: 3px;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    line-height: 1.4;
+    color: var(--texto);
+  }
+  .ev-control::placeholder { color: transparent; }
+  input[type='date'].ev-vacio { color: transparent; }
+  input[type='date']::-webkit-calendar-picker-indicator { display: none; }
+
+  .ev-pastilla span { min-height: 0; padding: 2px 8px; font-size: inherit; }
+
+  h2, h3, h4 { break-after: avoid; page-break-after: avoid; }
+  tr, .ev-evitar-corte { break-inside: avoid; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+}

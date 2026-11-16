@@ -1,0 +1,105 @@
+---
+// Sección 6: plan de mejora y compromisos (empieza con N filas + botón "Agregar fila")
+import SeccionFormato from './SeccionFormato.astro';
+import FilaPlan from './FilaPlan.astro';
+import Icono from '../Icono.astro';
+
+interface Props {
+  numero: number;
+  titulo: string;
+  descripcion: string;
+  columnas: { id: string; titulo: string; tipo: 'textarea' | 'date' }[];
+  filasIniciales: number;
+  botonAgregar: string;
+}
+const { numero, titulo, descripcion, columnas, filasIniciales, botonAgregar } = Astro.props;
+const filas = Array.from({ length: filasIniciales }, (_, i) => i + 1);
+---
+<SeccionFormato id="seccion-plan" numero={numero} titulo={titulo} descripcion={descripcion}>
+  <table class="ev-plan">
+    <caption class="oculto-visual">{titulo}</caption>
+    <thead>
+      <tr>
+        {columnas.map((c) => <th scope="col" class:list={{ 'ev-plan__col-fecha': c.tipo === 'date' }}>{c.titulo}</th>)}
+        <th scope="col" class="ev-plan__quitar ev-no-imprimir"><span class="oculto-visual">Quitar</span></th>
+      </tr>
+    </thead>
+    <tbody data-filas-plan data-siguiente={filasIniciales + 1}>
+      {filas.map((n) => <FilaPlan n={n} columnas={columnas} />)}
+    </tbody>
+  </table>
+
+  <template data-plantilla-fila>
+    <FilaPlan n="__N__" columnas={columnas} quitable />
+  </template>
+
+  <button type="button" class="boton boton--borde ev-plan__agregar ev-no-imprimir" data-agregar-fila>
+    <Icono nombre="mas" tam={18} /> {botonAgregar}
+  </button>
+</SeccionFormato>
+
+<style>
+  .ev-plan { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  /* Celular: cada compromiso es una tarjeta */
+  .ev-plan thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ev-plan tbody, .ev-plan :global(tr), .ev-plan :global(td) { display: block; }
+  .ev-plan :global(tbody tr) {
+    position: relative;
+    display: grid;
+    gap: 0.7rem;
+    margin-bottom: 0.9rem;
+    padding: 1rem;
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--dorado);
+    border-radius: var(--radio);
+    background: var(--evaluacion-fila-par);
+  }
+  .ev-plan :global(.ev-plan__quitar) { position: absolute; top: 0.4rem; right: 0.4rem; }
+  .ev-plan :global(.ev-plan__quitar--vacia) { display: none; }
+  .ev-plan :global(.ev-plan__boton-quitar) {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--borde);
+    background: var(--blanco);
+    color: var(--texto-suave);
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .ev-plan :global(.ev-plan__boton-quitar:hover) { border-color: var(--dorado); color: var(--verde-oscuro); }
+
+  .ev-plan__agregar { margin-top: 0.4rem; }
+
+  /* Escritorio e impresión: tabla */
+  @media (min-width: 1000px), print {
+    .ev-plan { border: 1px solid var(--borde); border-radius: var(--radio); overflow: hidden; }
+    .ev-plan thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+    .ev-plan tbody { display: table-row-group; }
+    .ev-plan :global(tr), .ev-plan :global(tbody tr) { display: table-row; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+    .ev-plan :global(th), .ev-plan :global(td) { display: table-cell; vertical-align: top; }
+    .ev-plan thead th {
+      padding: 0.7rem 0.8rem;
+      background: var(--evaluacion-cabecera-tabla);
+      color: var(--evaluacion-cabecera-texto);
+      text-align: left;
+      font-size: var(--tam-pequeno);
+      font-weight: 600;
+    }
+    .ev-plan__col-fecha { width: 11rem; }
+    .ev-plan :global(tbody td) { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--borde); }
+    .ev-plan :global(tbody tr:nth-child(even) td) { background: var(--evaluacion-fila-par); }
+    .ev-plan :global(.ev-plan__quitar) { position: static; width: 3.2rem; }
+    .ev-plan :global(.ev-plan__quitar--vacia) { display: table-cell; }
+  }
+
+  @media print {
+    .ev-plan { border-radius: 0; }
+    .ev-plan thead th { padding: 1.5mm 2mm; font-size: 8.5pt; }
+    .ev-plan__col-fecha { width: 28mm; }
+    .ev-plan :global(tbody td) { padding: 1.5mm 2mm; }
+  }
+</style>

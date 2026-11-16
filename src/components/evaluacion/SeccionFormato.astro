@@ -1,0 +1,56 @@
+---
+// Contenedor de cada sección numerada del formato (título + descripción + contenido)
+interface Props {
+  id: string;
+  numero?: number;
+  titulo: string;
+  descripcion?: string;
+  /** true = al imprimir, no partir la sección entre dos hojas (secciones cortas) */
+  evitarCorte?: boolean;
+}
+const { id, numero, titulo, descripcion, evitarCorte = false } = Astro.props;
+---
+<section class:list={['ev-seccion', { 'ev-evitar-corte': evitarCorte }]} id={id} aria-labelledby={`${id}-titulo`}>
+  <header class="ev-seccion__cabeza">
+    <h3 id={`${id}-titulo`}>
+      {numero && <span class="ev-seccion__numero">{numero}</span>}
+      {titulo}
+    </h3>
+    {descripcion && <p>{descripcion}</p>}
+  </header>
+  <slot />
+</section>
+
+<style>
+  .ev-seccion { margin-top: var(--evaluacion-espacio-seccion); }
+  .ev-seccion__cabeza { margin-bottom: 1rem; }
+  .ev-seccion__cabeza h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 2px solid var(--dorado-suave);
+    font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  }
+  .ev-seccion__numero {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde));
+    border: 2px solid var(--dorado);
+    color: var(--dorado-claro);
+    font-size: 0.95rem;
+  }
+  .ev-seccion__cabeza p { margin-top: 0.6rem; color: var(--texto-suave); font-size: 0.95rem; }
+
+  @media print {
+    .ev-seccion { margin-top: 5mm; }
+    .ev-seccion__cabeza { margin-bottom: 2mm; }
+    .ev-seccion__cabeza h3 { font-size: 11.5pt; padding-bottom: 1mm; }
+    .ev-seccion__numero { width: 20px; height: 20px; font-size: 9pt; border-width: 1.5px; }
+    .ev-seccion__cabeza p { margin-top: 1mm; font-size: inherit; }
+  }
+</style>

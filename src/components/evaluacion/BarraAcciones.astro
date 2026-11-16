@@ -1,0 +1,44 @@
+---
+// Barra con el aviso de privacidad y los botones Imprimir / Limpiar.
+// Se puede usar varias veces en la página (arriba y abajo del formulario).
+import Icono from '../Icono.astro';
+
+interface Props { aviso: string; imprimir: string; limpiar: string; mostrarAviso?: boolean }
+const { aviso, imprimir, limpiar, mostrarAviso = true } = Astro.props;
+---
+<div class="ev-acciones ev-no-imprimir">
+  {mostrarAviso && (
+    <p class="ev-aviso" role="note">
+      <Icono nombre="candado" tam={20} />
+      <span>{aviso}</span>
+    </p>
+  )}
+  <div class="ev-acciones__botones">
+    <button type="button" class="boton boton--verde" data-accion="imprimir">
+      <Icono nombre="documento" tam={18} /> {imprimir}
+    </button>
+    <button type="button" class="boton boton--borde" data-accion="limpiar">
+      <Icono nombre="basura" tam={18} /> {limpiar}
+    </button>
+  </div>
+</div>
+
+<style>
+  .ev-acciones { display: grid; gap: 1rem; }
+  .ev-aviso {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: var(--radio);
+    background: var(--evaluacion-aviso-fondo);
+    border: 1px solid var(--evaluacion-aviso-borde);
+    font-weight: 600;
+    color: var(--verde-oscuro);
+  }
+  .ev-aviso :global(svg) { flex-shrink: 0; color: var(--verde); }
+  .ev-acciones__botones { display: flex; flex-direction: column; gap: 0.6rem; }
+  @media (min-width: 560px) {
+    .ev-acciones__botones { flex-direction: row; flex-wrap: wrap; }
+  }
+</style>

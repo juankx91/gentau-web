@@ -1,0 +1,59 @@
+---
+// Datos generales de la evaluación (nombre, fechas, área, tipo…)
+import SeccionFormato from './SeccionFormato.astro';
+
+interface Campo {
+  id: string;
+  etiqueta: string;
+  tipo: 'text' | 'date' | 'opciones';
+  valor?: string;
+  ancho?: 'completo';
+  opciones?: string[];
+}
+interface Props { titulo: string; campos: Campo[] }
+const { titulo, campos } = Astro.props;
+---
+<SeccionFormato id="seccion-datos" titulo={titulo} evitarCorte>
+  <div class="ev-datos">
+    {campos.map((c) =>
+      c.tipo === 'opciones' ? (
+        <fieldset class="ev-datos__campo ev-pastillas">
+          <legend class="ev-etiqueta">{c.etiqueta}</legend>
+          {c.opciones?.map((o) => (
+            <label class="ev-pastilla">
+              <input type="radio" name={`dato-${c.id}`} value={o} />
+              <span>{o}</span>
+            </label>
+          ))}
+        </fieldset>
+      ) : (
+        <div class:list={['ev-datos__campo', { 'ev-datos__campo--completo': c.ancho === 'completo' }]}>
+          <label class="ev-etiqueta" for={`dato-${c.id}`}>{c.etiqueta}</label>
+          <input
+            class:list={['ev-control', { 'ev-vacio': c.tipo === 'date' && !c.valor }]}
+            type={c.tipo}
+            id={`dato-${c.id}`}
+            name={`dato-${c.id}`}
+            value={c.valor}
+          />
+        </div>
+      )
+    )}
+  </div>
+</SeccionFormato>
+
+<style>
+  .ev-datos { display: grid; gap: 1rem; }
+  @media (min-width: 600px), print {
+    .ev-datos { grid-template-columns: repeat(2, 1fr); }
+    .ev-datos__campo--completo { grid-column: 1 / -1; }
+  }
+  @media (min-width: 960px) {
+    .ev-datos { grid-template-columns: repeat(3, 1fr); }
+  }
+  .ev-datos__campo { min-width: 0; }
+
+  @media print {
+    .ev-datos { gap: 2mm 6mm; }
+  }
+</style>

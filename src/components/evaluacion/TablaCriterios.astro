@@ -1,0 +1,132 @@
+---
+// Secciones 2, 3 y 4: tabla de criterios con nota (1 a 5 / N/A), observaciones y promedio.
+// En celular cada criterio se ve como una tarjeta.
+import SeccionFormato from './SeccionFormato.astro';
+import EscalaNota from './EscalaNota.astro';
+
+interface Props {
+  seccion: {
+    id: string;
+    numero: number;
+    titulo: string;
+    descripcion?: string;
+    columnas: { aspecto: string; esperado: string };
+    criterios: { aspecto: string; esperado: string }[];
+  };
+  escala: { niveles: { valor: number; etiqueta: string }[]; noAplica: string };
+  sinNotas: string;
+}
+const { seccion: s, escala, sinNotas } = Astro.props;
+---
+<SeccionFormato id={`seccion-${s.id}`} numero={s.numero} titulo={s.titulo} descripcion={s.descripcion}>
+  <table class="ev-tabla" data-seccion={s.id}>
+    <caption class="oculto-visual">{s.titulo}</caption>
+    <thead>
+      <tr>
+        <th scope="col" class="ev-tabla__col-aspecto">{s.columnas.aspecto} <span class="ev-tabla__sub">/ {s.columnas.esperado}</span></th>
+        <th scope="col" class="ev-tabla__col-nota">Nota (1 a 5)</th>
+        <th scope="col">Observaciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {s.criterios.map((c, i) => (
+        <tr>
+          <th scope="row" class="ev-tabla__aspecto">
+            <span class="ev-tabla__nombre">{c.aspecto}</span>
+            <span class="ev-tabla__esperado">{c.esperado}</span>
+          </th>
+          <td class="ev-tabla__nota">
+            <EscalaNota name={`nota-${s.id}-${i + 1}`} criterio={c.aspecto} niveles={escala.niveles} noAplica={escala.noAplica} />
+          </td>
+          <td class="ev-tabla__obs">
+            <label class="ev-etiqueta ev-etiqueta-movil" for={`obs-${s.id}-${i + 1}`}>
+              Observaciones<span class="oculto-visual"> sobre {c.aspecto}</span>
+            </label>
+            <textarea id={`obs-${s.id}-${i + 1}`} name={`obs-${s.id}-${i + 1}`} class="ev-control" rows="2" data-autoalto></textarea>
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+  <!-- Fuera de la tabla para que no se repita en cada hoja al imprimir -->
+  <p class="ev-promedio">
+    <span>Promedio de la sección:</span>
+    <output class="ev-promedio__valor" data-promedio={s.id}>—</output>
+    <span class="ev-promedio__etq" data-promedio-etiqueta={s.id}>{sinNotas}</span>
+    <span class="ev-promedio__conteo" data-promedio-conteo={s.id}>0 de {s.criterios.length} calificados</span>
+  </p>
+</SeccionFormato>
+
+<style>
+  .ev-tabla { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  /* ---- Celular: tarjetas ---- */
+  .ev-tabla thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ev-tabla tbody, .ev-tabla tr, .ev-tabla th, .ev-tabla td { display: block; }
+  .ev-tabla tbody tr {
+    margin-bottom: 0.9rem;
+    padding: 1rem;
+    border: 1px solid var(--borde);
+    border-left: 4px solid var(--dorado);
+    border-radius: var(--radio);
+    background: var(--evaluacion-fila-par);
+  }
+  .ev-tabla__aspecto { text-align: left; font-weight: 400; margin-bottom: 0.8rem; }
+  .ev-tabla__nombre { display: block; font-family: var(--fuente-titulos); font-weight: 600; color: var(--verde-oscuro); }
+  .ev-tabla__esperado { display: block; margin-top: 0.2rem; font-size: 0.88rem; color: var(--texto-suave); }
+  .ev-tabla__nota { margin-bottom: 0.8rem; }
+
+  .ev-promedio {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3rem 0.7rem;
+    padding: 0.8rem 1rem;
+    border-radius: var(--radio);
+    background: var(--evaluacion-cabecera-tabla);
+    color: var(--blanco);
+    font-size: 0.92rem;
+  }
+  .ev-promedio__valor { font-family: var(--fuente-titulos); font-size: 1.3rem; font-weight: 700; color: var(--evaluacion-cabecera-texto); }
+  .ev-promedio__etq { font-weight: 600; color: var(--evaluacion-cabecera-texto); }
+  .ev-promedio__conteo { font-size: 0.8rem; color: #c3d1c9; }
+
+  /* ---- Escritorio e impresión: tabla real ---- */
+  @media (min-width: 1000px), print {
+    .ev-tabla { table-layout: fixed; border: 1px solid var(--borde); border-bottom: 0; border-radius: var(--radio) var(--radio) 0 0; overflow: hidden; }
+    .ev-tabla thead { position: static; width: auto; height: auto; overflow: visible; clip: auto; display: table-header-group; }
+    .ev-tabla tbody { display: table-row-group; }
+    .ev-tabla tr { display: table-row; }
+    .ev-tabla th, .ev-tabla td { display: table-cell; vertical-align: top; }
+    .ev-tabla tbody tr { margin: 0; padding: 0; border: 0; border-radius: 0; background: none; }
+
+    .ev-tabla thead th {
+      padding: 0.7rem 0.9rem;
+      background: var(--evaluacion-cabecera-tabla);
+      color: var(--evaluacion-cabecera-texto);
+      text-align: left;
+      font-size: var(--tam-pequeno);
+      font-weight: 600;
+    }
+    .ev-tabla__sub { font-weight: 400; opacity: 0.85; }
+    .ev-tabla__col-aspecto { width: 29%; }
+    .ev-tabla__col-nota { width: 43%; }
+    .ev-tabla tbody th, .ev-tabla tbody td { padding: 0.8rem 0.9rem; border-bottom: 1px solid var(--borde); }
+    .ev-tabla tbody tr:nth-child(even) > * { background: var(--evaluacion-fila-par); }
+    .ev-tabla__aspecto, .ev-tabla__nota { margin: 0; }
+    .ev-promedio { border-radius: 0 0 var(--radio) var(--radio); }
+  }
+
+  @media print {
+    .ev-tabla { border-radius: 0; }
+    .ev-promedio { border-radius: 0; break-before: avoid; page-break-before: avoid; }
+    .ev-tabla thead th { padding: 1.5mm 2mm; font-size: 8.5pt; }
+    .ev-tabla__col-aspecto { width: 34%; }
+    .ev-tabla__col-nota { width: 36%; }
+    .ev-tabla tbody th, .ev-tabla tbody td { padding: 1.5mm 2mm; }
+    .ev-tabla__esperado { font-size: 8pt; }
+    .ev-promedio { padding: 1.5mm 2mm; font-size: 9pt; }
+    .ev-promedio__valor { font-size: 11pt; }
+    .ev-promedio__conteo { font-size: 8pt; }
+  }
+</style>

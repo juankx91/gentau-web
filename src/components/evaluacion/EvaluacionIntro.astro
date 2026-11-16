@@ -1,0 +1,75 @@
+---
+// Parte A: para qué sirve la evaluación, cómo se usa y botón de descarga del Word
+import Icono from '../Icono.astro';
+
+interface Props {
+  etiqueta: string;
+  paraQue: { titulo: string; texto: string };
+  comoSeUsa: { titulo: string; pasos: { icono: string; titulo: string; texto: string }[] };
+  descarga: { texto: string; url: string; detalle: string };
+}
+const { etiqueta, paraQue, comoSeUsa, descarga } = Astro.props;
+---
+<section class="seccion ev-intro ev-no-imprimir">
+  <div class="contenedor">
+    <div class="dos-columnas">
+      <div class="aparecer">
+        <span class="etiqueta">{etiqueta}</span>
+        <h2>{paraQue.titulo}</h2>
+        <p class="frase mt-2">{paraQue.texto}</p>
+      </div>
+      <div class="ev-descarga aparecer">
+        <span class="icono-circulo"><Icono nombre="documento" /></span>
+        <h3>Formato en Word</h3>
+        <p>Imprímelo y llénalo a mano, o usa el formulario de esta página.</p>
+        <div class="ev-descarga__botones">
+          <a href={descarga.url} class="boton boton--dorado" download>
+            <Icono nombre="flecha" tam={18} class="ev-descarga__flecha" /> {descarga.texto}
+          </a>
+          <a href="#formulario" class="boton boton--borde">Llenar en pantalla</a>
+        </div>
+        <p class="ev-descarga__detalle">{descarga.detalle}</p>
+      </div>
+    </div>
+
+    <h2 class="ev-intro__subtitulo aparecer">{comoSeUsa.titulo}</h2>
+    <ol class="ev-pasos">
+      {comoSeUsa.pasos.map((p, i) => (
+        <li class="tarjeta ev-paso aparecer">
+          <span class="icono-circulo"><Icono nombre={p.icono} /></span>
+          <span class="ev-paso__num" aria-hidden="true">{i + 1}</span>
+          <h3>{p.titulo}</h3>
+          <p>{p.texto}</p>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .ev-descarga {
+    padding: var(--formacion-espacio-tarjeta);
+    border-radius: var(--radio-grande);
+    background: var(--blanco);
+    border: 1px solid var(--dorado-suave);
+    box-shadow: var(--sombra-fuerte);
+  }
+  .ev-descarga h3 { margin-bottom: 0.4rem; }
+  .ev-descarga p { color: var(--texto-suave); }
+  .ev-descarga__botones { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1.4rem; }
+  .ev-descarga__botones :global(.ev-descarga__flecha) { transform: rotate(90deg); }
+  .ev-descarga__detalle { margin-top: 0.7rem; font-size: var(--tam-pequeno); }
+
+  .ev-intro__subtitulo { margin: clamp(3rem, 6vw, 4.5rem) 0 1.5rem; text-align: center; }
+  .ev-pasos { list-style: none; display: grid; gap: var(--formacion-espacio-grid); grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+  .ev-paso { padding: var(--formacion-espacio-tarjeta); }
+  .ev-paso__num {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.4rem;
+    font-family: var(--fuente-titulos);
+    font-size: 1.6rem;
+    color: var(--dorado);
+  }
+  .ev-intro :focus-visible { outline: var(--formacion-foco); outline-offset: 3px; }
+</style>

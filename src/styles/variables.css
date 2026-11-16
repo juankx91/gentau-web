@@ -70,4 +70,26 @@
   --formacion-espacio-grid: 1.5rem;   /* separación entre tarjetas */
   --formacion-radio-pastilla: 999px;  /* botones y etiquetas redondeadas */
   --formacion-foco: 3px solid var(--dorado); /* contorno al navegar con teclado */
+
+  /* 8) EVALUACIÓN DE DESEMPEÑO (/nuestra-gente/evaluacion-desempeno)
+     Reutiliza los colores de la marca y las variables de "Modelo de Formación". */
+  --evaluacion-campo-fondo: #fffdf7;          /* fondo de los campos para escribir */
+  --evaluacion-campo-borde: var(--borde);
+  --evaluacion-campo-borde-foco: var(--dorado);
+  --evaluacion-campo-radio: 10px;
+  --evaluacion-opcion-tam: 44px;              /* alto mínimo de cada botón de nota (táctil) */
+  --evaluacion-opcion-fondo: var(--blanco);
+  --evaluacion-opcion-activa: var(--verde-oscuro);
+  --evaluacion-opcion-activa-texto: var(--dorado-claro);
+  --evaluacion-na-activa: #6b6b5e;            /* color del botón N/A marcado */
+  --evaluacion-aviso-fondo: #fdf6dc;          /* aviso "Los datos no se guardan" */
+  --evaluacion-aviso-borde: var(--dorado);
+  --evaluacion-cabecera-tabla: var(--verde-oscuro);
+  --evaluacion-cabecera-texto: var(--dorado-claro);
+  --evaluacion-fila-par: #fcfaf3;
+  --evaluacion-espacio-seccion: clamp(1.5rem, 4vw, 2.5rem); /* separación entre secciones del formato */
+  --evaluacion-impresion-letra: 9.5pt;        /* tamaño de letra al imprimir */
+  --evaluacion-impresion-linea: #8a8a7a;      /* líneas de campos y firmas al imprimir */
+  /* Los márgenes de la hoja A4 están en src/styles/evaluacion.css (@page),
+     porque los navegadores no aceptan variables dentro de @page. */
 }

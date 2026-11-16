@@ -1,0 +1,78 @@
+---
+// Botones de opción (radio) para calificar un criterio: 1 a 5 y N/A.
+// Debajo de cada número se muestra la etiqueta de la escala.
+interface Nivel { valor: number; etiqueta: string }
+interface Props {
+  name: string;
+  /** Nombre del criterio (para lectores de pantalla) */
+  criterio: string;
+  niveles: Nivel[];
+  noAplica: string;
+}
+const { name, criterio, niveles, noAplica } = Astro.props;
+---
+<fieldset class="ev-escala">
+  <legend class="oculto-visual">Nota para: {criterio}</legend>
+  <div class="ev-escala__opciones">
+    {niveles.map((n) => (
+      <label class="ev-opcion">
+        <input type="radio" name={name} value={n.valor} />
+        <span class="ev-opcion__num">{n.valor}</span>
+        <span class="ev-opcion__etq">{n.etiqueta}</span>
+      </label>
+    ))}
+    <label class="ev-opcion ev-opcion--na">
+      <input type="radio" name={name} value="na" />
+      <span class="ev-opcion__num">{noAplica}</span>
+      <span class="ev-opcion__etq">No aplica</span>
+    </label>
+  </div>
+</fieldset>
+
+<style>
+  .ev-escala { border: 0; min-width: 0; }
+  /* Celular: 3 columnas (1 2 3 / 4 5 N/A) para que las etiquetas se lean completas */
+  .ev-escala__opciones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+  /* Con más espacio: una sola fila; cada botón toma el ancho que necesita su etiqueta */
+  @media (min-width: 520px), print {
+    .ev-escala__opciones { display: flex; gap: 0.3rem; }
+    .ev-opcion { flex: 1 1 auto; min-width: 2.6rem; }
+  }
+
+  .ev-opcion {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--evaluacion-opcion-tam);
+    padding: 0.35rem 0.2rem;
+    border: 1px solid var(--evaluacion-campo-borde);
+    border-radius: var(--evaluacion-campo-radio);
+    background: var(--evaluacion-opcion-fondo);
+    text-align: center;
+    cursor: pointer;
+    transition: background var(--transicion), border-color var(--transicion), color var(--transicion);
+  }
+  .ev-opcion input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+  .ev-opcion__num { font-family: var(--fuente-titulos); font-weight: 700; font-size: 1.05rem; line-height: 1.2; color: var(--verde-oscuro); }
+  .ev-opcion__etq {
+    font-size: 0.66rem;
+    line-height: 1.15;
+    color: var(--texto-suave);
+  }
+  .ev-opcion:hover { border-color: var(--dorado); }
+  .ev-opcion:has(input:checked) { background: var(--evaluacion-opcion-activa); border-color: var(--evaluacion-opcion-activa); }
+  .ev-opcion:has(input:checked) .ev-opcion__num,
+  .ev-opcion:has(input:checked) .ev-opcion__etq { color: var(--evaluacion-opcion-activa-texto); }
+  .ev-opcion--na:has(input:checked) { background: var(--evaluacion-na-activa); border-color: var(--evaluacion-na-activa); }
+  .ev-opcion--na:has(input:checked) .ev-opcion__num,
+  .ev-opcion--na:has(input:checked) .ev-opcion__etq { color: var(--blanco); }
+  .ev-opcion:has(input:focus-visible) { outline: var(--formacion-foco); outline-offset: 2px; }
+
+  @media print {
+    .ev-opcion { min-height: 0; padding: 1px 0; border-radius: 3px; }
+    .ev-opcion__num { font-size: 9pt; }
+    .ev-opcion__etq { display: none; } /* la escala completa está en la sección 1 */
+  }
+</style>

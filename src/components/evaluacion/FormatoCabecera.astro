@@ -1,0 +1,34 @@
+---
+// Encabezado del formato (se ve en pantalla y al imprimir, como el Word)
+interface Props { titulo: string; cargo: string; lema: string }
+const { titulo, cargo, lema } = Astro.props;
+---
+<header class="ev-cabecera">
+  <p class="ev-cabecera__marca">GENTAU</p>
+  <h2>{titulo}</h2>
+  <p class="ev-cabecera__cargo"><strong>Cargo:</strong> {cargo}</p>
+  <p class="ev-cabecera__lema">“{lema}”</p>
+</header>
+
+<style>
+  .ev-cabecera {
+    padding: 1.4rem 1rem;
+    text-align: center;
+    border-radius: var(--radio);
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    color: var(--blanco);
+  }
+  .ev-cabecera__marca { font-family: var(--fuente-titulos); font-size: 1.1rem; letter-spacing: 0.3em; color: var(--dorado-claro); }
+  .ev-cabecera h2 { margin-top: 0.3rem; color: var(--blanco); font-size: clamp(1.4rem, 3.5vw, 2rem); text-transform: uppercase; letter-spacing: 0.04em; }
+  .ev-cabecera__cargo { margin-top: 0.4rem; color: #dfe8e2; }
+  .ev-cabecera__cargo strong { color: var(--dorado-claro); }
+  .ev-cabecera__lema { margin-top: 0.2rem; font-family: var(--fuente-acento); font-style: italic; font-size: 1.25rem; color: var(--dorado-claro); }
+
+  @media print {
+    .ev-cabecera { padding: 4mm; border-radius: 0; }
+    .ev-cabecera__marca { font-size: 10pt; }
+    .ev-cabecera h2 { font-size: 16pt; margin-top: 1mm; }
+    .ev-cabecera__cargo { margin-top: 1mm; }
+    .ev-cabecera__lema { font-size: 12pt; margin-top: 0; }
+  }
+</style>

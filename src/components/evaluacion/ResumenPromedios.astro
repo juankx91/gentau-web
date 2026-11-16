@@ -1,0 +1,86 @@
+---
+// Resumen de promedios de las secciones 2, 3 y 4 y promedio general.
+// Los valores se calculan en el navegador (src/scripts/evaluacion.js).
+interface Props {
+  titulo: string;
+  nota: string;
+  sinNotas: string;
+  secciones: { id: string; numero: number; titulo: string; criterios: unknown[] }[];
+}
+const { titulo, nota, sinNotas, secciones } = Astro.props;
+const totalCriterios = secciones.reduce((s, x) => s + x.criterios.length, 0);
+const tarjetas = [
+  ...secciones.map((s) => ({ id: s.id, rotulo: `${s.numero}. ${s.titulo}`, total: s.criterios.length, general: false })),
+  { id: 'general', rotulo: 'Promedio general', total: totalCriterios, general: true },
+];
+---
+<section class="ev-resumen ev-evitar-corte" aria-labelledby="ev-resumen-titulo">
+  <h3 id="ev-resumen-titulo">{titulo}</h3>
+  <div class="ev-resumen__grid">
+    {tarjetas.map((t) => (
+      <div class:list={['ev-resumen__tarjeta', { 'ev-resumen__tarjeta--general': t.general }]}>
+        <p class="ev-resumen__rotulo">{t.rotulo}</p>
+        <p class="ev-resumen__valor">
+          <output data-promedio={t.id}>—</output>
+          <span class="ev-resumen__de">/ 5</span>
+        </p>
+        <p class="ev-resumen__etq" data-promedio-etiqueta={t.id}>{sinNotas}</p>
+        <span class="ev-resumen__barra" aria-hidden="true"><span data-promedio-barra={t.id}></span></span>
+        <p class="ev-resumen__conteo" data-promedio-conteo={t.id}>0 de {t.total} calificados</p>
+      </div>
+    ))}
+  </div>
+  <p class="ev-resumen__nota">{nota}</p>
+</section>
+
+<style>
+  .ev-resumen {
+    margin-top: var(--evaluacion-espacio-seccion);
+    padding: var(--formacion-espacio-tarjeta);
+    border-radius: var(--radio);
+    background: var(--menta);
+    border: 1px solid var(--dorado-suave);
+  }
+  .ev-resumen h3 { font-size: clamp(1.1rem, 2.2vw, 1.35rem); margin-bottom: 1rem; }
+  .ev-resumen__grid { display: grid; gap: 0.8rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
+  @media print { .ev-resumen__grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .ev-resumen__tarjeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 1rem;
+    border-radius: var(--radio);
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+  }
+  .ev-resumen__tarjeta--general {
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde-noche));
+    border-color: var(--dorado);
+    color: var(--blanco);
+  }
+  .ev-resumen__rotulo { font-size: 0.8rem; font-weight: 600; color: var(--texto-suave); flex: 1; }
+  .ev-resumen__tarjeta--general .ev-resumen__rotulo { color: var(--dorado-claro); letter-spacing: 0.1em; text-transform: uppercase; }
+  .ev-resumen__valor { font-family: var(--fuente-titulos); font-size: 2rem; font-weight: 700; line-height: 1.1; color: var(--verde-oscuro); }
+  .ev-resumen__tarjeta--general .ev-resumen__valor { color: var(--dorado-claro); }
+  .ev-resumen__de { font-size: 0.9rem; font-weight: 400; color: var(--texto-suave); }
+  .ev-resumen__tarjeta--general .ev-resumen__de { color: #c3d1c9; }
+  .ev-resumen__etq { font-weight: 600; color: var(--verde); }
+  .ev-resumen__tarjeta--general .ev-resumen__etq { color: var(--blanco); }
+  .ev-resumen__barra { display: block; height: 6px; margin: 0.3rem 0; border-radius: var(--formacion-radio-pastilla); background: var(--verde-claro); overflow: hidden; }
+  .ev-resumen__barra span { display: block; height: 100%; width: 0; background: var(--degradado-dorado); transition: width var(--transicion); }
+  .ev-resumen__conteo { font-size: 0.78rem; color: var(--texto-suave); }
+  .ev-resumen__tarjeta--general .ev-resumen__conteo { color: #c3d1c9; }
+  .ev-resumen__nota { margin-top: 0.9rem; font-size: 0.85rem; color: var(--texto-suave); }
+
+  @media (prefers-reduced-motion: reduce) { .ev-resumen__barra span { transition: none; } }
+
+  @media print {
+    .ev-resumen { margin-top: 5mm; padding: 3mm; }
+    .ev-resumen h3 { font-size: 11.5pt; margin-bottom: 2mm; }
+    .ev-resumen__tarjeta { padding: 2mm; }
+    .ev-resumen__valor { font-size: 14pt; }
+    .ev-resumen__rotulo, .ev-resumen__conteo, .ev-resumen__nota { font-size: 8pt; }
+    .ev-resumen__nota { margin-top: 2mm; }
+  }
+</style>

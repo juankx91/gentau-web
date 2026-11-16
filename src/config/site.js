@@ -41,6 +41,7 @@ export const menu = [
     hijos: [
       { texto: 'Plan de Bienestar 2027', url: '/nuestra-gente/bienestar' },
       { texto: 'Modelo de Formación 2027', url: '/nuestra-gente/formacion' },
+      { texto: 'Evaluación de Desempeño', url: '/nuestra-gente/evaluacion-desempeno' },
       { texto: 'Seguridad y Salud (SST)', url: '/nuestra-gente/sst' },
       { texto: 'Inducción y beneficios', url: '/nuestra-gente/induccion' },
       { texto: 'Reglamento Interno', url: '/nuestra-gente/reglamento' },

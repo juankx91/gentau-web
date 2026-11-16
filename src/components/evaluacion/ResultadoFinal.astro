@@ -1,0 +1,66 @@
+---
+// Sección 7: resultado general (lo elige el evaluador a mano) y comentarios finales
+import SeccionFormato from './SeccionFormato.astro';
+import Icono from '../Icono.astro';
+
+interface Props {
+  numero: number;
+  titulo: string;
+  etiquetaResultado: string;
+  opciones: string[];
+  comentarios: { id: string; titulo: string }[];
+  importante: string;
+}
+const { numero, titulo, etiquetaResultado, opciones, comentarios, importante } = Astro.props;
+---
+<SeccionFormato id="seccion-resultado" numero={numero} titulo={titulo} evitarCorte>
+  <fieldset class="ev-pastillas ev-resultado__opciones">
+    <legend class="ev-etiqueta">{etiquetaResultado}</legend>
+    {opciones.map((o) => (
+      <label class="ev-pastilla">
+        <input type="radio" name="resultado-general" value={o} />
+        <span>{o}</span>
+      </label>
+    ))}
+  </fieldset>
+
+  <div class="ev-resultado__comentarios">
+    {comentarios.map((c) => (
+      <div>
+        <label class="ev-etiqueta" for={c.id}>{c.titulo}</label>
+        <textarea id={c.id} name={c.id} class="ev-control" rows="4" data-autoalto></textarea>
+      </div>
+    ))}
+  </div>
+
+  <aside class="ev-importante" aria-label="Importante">
+    <Icono nombre="alerta" tam={22} />
+    <p><strong>Importante:</strong> {importante}</p>
+  </aside>
+</SeccionFormato>
+
+<style>
+  .ev-resultado__comentarios { display: grid; gap: 1rem; margin-top: 1.2rem; }
+  @media (min-width: 760px), print { .ev-resultado__comentarios { grid-template-columns: repeat(2, 1fr); } }
+  .ev-resultado__comentarios textarea { min-height: 6.5rem; }
+
+  .ev-importante {
+    display: flex;
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: var(--radio);
+    background: var(--evaluacion-aviso-fondo);
+    border-left: 4px solid var(--evaluacion-aviso-borde);
+    font-size: 0.92rem;
+    color: var(--texto);
+  }
+  .ev-importante :global(svg) { flex-shrink: 0; color: var(--verde); margin-top: 2px; }
+  .ev-importante strong { color: var(--verde-oscuro); }
+
+  @media print {
+    .ev-resultado__comentarios { gap: 3mm; margin-top: 3mm; }
+    .ev-resultado__comentarios :global(.ev-espejo) { min-height: 20mm; }
+    .ev-importante { margin-top: 3mm; padding: 2mm 3mm; font-size: 8.5pt; }
+  }
+</style>

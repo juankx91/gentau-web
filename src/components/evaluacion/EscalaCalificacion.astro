@@ -1,0 +1,61 @@
+---
+// Sección 1: escala de calificación (referencia)
+import SeccionFormato from './SeccionFormato.astro';
+
+interface Props {
+  numero: number;
+  titulo: string;
+  niveles: { valor: number; etiqueta: string }[];
+  noAplica: string;
+  instruccion: string;
+}
+const { numero, titulo, niveles, noAplica, instruccion } = Astro.props;
+---
+<SeccionFormato id="seccion-escala" numero={numero} titulo={titulo} evitarCorte>
+  <ul class="ev-niveles">
+    {niveles.map((n) => (
+      <li><span class="ev-niveles__num">{n.valor}</span><span>{n.etiqueta}</span></li>
+    ))}
+    <li class="ev-niveles__na"><span class="ev-niveles__num">{noAplica}</span><span>No aplica</span></li>
+  </ul>
+  <p class="ev-instruccion">{instruccion}</p>
+</SeccionFormato>
+
+<style>
+  .ev-niveles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+  @media (min-width: 640px), print { .ev-niveles { grid-template-columns: repeat(6, 1fr); } }
+  .ev-niveles li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.7rem 0.4rem;
+    border: 1px solid var(--borde);
+    border-radius: var(--radio);
+    background: var(--evaluacion-fila-par);
+    text-align: center;
+    font-size: var(--tam-pequeno);
+    font-weight: 600;
+    color: var(--verde-oscuro);
+  }
+  .ev-niveles__num {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--verde-oscuro), var(--verde));
+    border: 2px solid var(--dorado);
+    color: var(--dorado-claro);
+    font-family: var(--fuente-titulos);
+    font-size: 0.95rem;
+  }
+  .ev-niveles__na .ev-niveles__num { background: var(--evaluacion-na-activa); font-size: 0.75rem; }
+  .ev-instruccion { margin-top: 0.9rem; font-size: 0.92rem; color: var(--texto-suave); }
+
+  @media print {
+    .ev-niveles li { padding: 1mm; font-size: 8.5pt; }
+    .ev-niveles__num { width: 22px; height: 22px; font-size: 9pt; border-width: 1.5px; }
+    .ev-instruccion { margin-top: 2mm; font-size: inherit; }
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+// Sección 8: firmas. En pantalla: campos de nombre. Al imprimir: líneas para firmar a mano.
+import SeccionFormato from './SeccionFormato.astro';
+
+interface Props { numero: number; titulo: string; personas: { id: string; rol: string }[] }
+const { numero, titulo, personas } = Astro.props;
+---
+<SeccionFormato id="seccion-firmas" numero={numero} titulo={titulo} evitarCorte>
+  <div class="ev-firmas">
+    {personas.map((p) => (
+      <div class="ev-firma">
+        <div class="ev-firma__linea solo-impresion" aria-hidden="true"></div>
+        <p class="ev-firma__rotulo solo-impresion">Firma del {p.rol}</p>
+        <label class="ev-etiqueta" for={`firma-${p.id}`}>Nombre del {p.rol}</label>
+        <input type="text" id={`firma-${p.id}`} name={`firma-${p.id}`} class="ev-control" />
+      </div>
+    ))}
+  </div>
+</SeccionFormato>
+
+<style>
+  .ev-firmas { display: grid; gap: 1.2rem; }
+  @media (min-width: 640px), print { .ev-firmas { grid-template-columns: repeat(2, 1fr); gap: 2rem; } }
+
+  @media print {
+    .ev-firmas { gap: 14mm; margin-top: 14mm; }
+    .ev-firma__linea { height: 0; border-bottom: 1px solid var(--texto); }
+    .ev-firma__rotulo { margin: 1mm 0 4mm; font-weight: 600; color: var(--verde-oscuro); }
+    .ev-firma .ev-etiqueta { display: inline; font-weight: 400; }
+  }
+</style>

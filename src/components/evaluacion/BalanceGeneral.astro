@@ -1,0 +1,37 @@
+---
+// Sección 5: balance general (cuatro cuadros de texto con pregunta guía)
+import SeccionFormato from './SeccionFormato.astro';
+
+interface Props { numero: number; titulo: string; cuadros: { id: string; titulo: string; guia: string }[] }
+const { numero, titulo, cuadros } = Astro.props;
+---
+<SeccionFormato id="seccion-balance" numero={numero} titulo={titulo} evitarCorte>
+  <div class="ev-balance">
+    {cuadros.map((c) => (
+      <div class="ev-balance__cuadro">
+        <label class="ev-etiqueta" for={`balance-${c.id}`}>{c.titulo}</label>
+        <p class="ev-balance__guia solo-impresion">{c.guia}</p>
+        <textarea id={`balance-${c.id}`} name={`balance-${c.id}`} class="ev-control" rows="4" placeholder={c.guia} data-autoalto></textarea>
+      </div>
+    ))}
+  </div>
+</SeccionFormato>
+
+<style>
+  .ev-balance { display: grid; gap: 1rem; }
+  @media (min-width: 760px), print { .ev-balance { grid-template-columns: repeat(2, 1fr); } }
+  .ev-balance__cuadro {
+    padding: 1rem;
+    border-radius: var(--radio);
+    background: var(--evaluacion-fila-par);
+    border-top: 3px solid var(--dorado);
+  }
+  .ev-balance__cuadro textarea { min-height: 6.5rem; }
+
+  @media print {
+    .ev-balance { gap: 3mm; }
+    .ev-balance__cuadro { padding: 2mm; }
+    .ev-balance__guia { font-size: 8pt; font-style: italic; color: var(--texto-suave); margin-bottom: 1mm; }
+    .ev-balance__cuadro :global(.ev-espejo) { min-height: 18mm; }
+  }
+</style>

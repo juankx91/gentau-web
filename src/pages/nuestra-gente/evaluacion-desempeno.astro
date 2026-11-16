@@ -1,0 +1,93 @@
+---
+// EVALUACIÓN DE DESEMPEÑO — AUXILIAR DE RECURSOS HUMANOS
+// Textos y criterios: src/data/evaluacionDesempeno.js
+// Colores y medidas:  src/styles/variables.css (sección 8)
+// Estilos del formato e impresión: src/styles/evaluacion.css
+// Secciones:          src/components/evaluacion/
+// Lógica (promedios, filas, imprimir, limpiar): src/scripts/evaluacion.js
+// El formulario NO guarda datos: todo queda en el navegador.
+import '../../styles/evaluacion.css';
+import GenteLayout from '../../layouts/GenteLayout.astro';
+import EvaluacionIntro from '../../components/evaluacion/EvaluacionIntro.astro';
+import FormatoCabecera from '../../components/evaluacion/FormatoCabecera.astro';
+import BarraAcciones from '../../components/evaluacion/BarraAcciones.astro';
+import DatosGenerales from '../../components/evaluacion/DatosGenerales.astro';
+import EscalaCalificacion from '../../components/evaluacion/EscalaCalificacion.astro';
+import TablaCriterios from '../../components/evaluacion/TablaCriterios.astro';
+import ResumenPromedios from '../../components/evaluacion/ResumenPromedios.astro';
+import BalanceGeneral from '../../components/evaluacion/BalanceGeneral.astro';
+import PlanMejora from '../../components/evaluacion/PlanMejora.astro';
+import ResultadoFinal from '../../components/evaluacion/ResultadoFinal.astro';
+import Firmas from '../../components/evaluacion/Firmas.astro';
+import { evaluacion as e } from '../../data/evaluacionDesempeno.js';
+---
+<GenteLayout
+  etiqueta="Talento humano · Formato"
+  titulo={e.titulo}
+  texto={`Cargo: ${e.cargo} · “${e.lema}”`}
+  imagen="/img/oficina.jpg"
+>
+  <!-- PARTE A: INFORMACIÓN -->
+  <EvaluacionIntro {...e.intro} descarga={e.descarga} />
+
+  <!-- PARTE B: FORMULARIO -->
+  <section class="seccion seccion--blanca ev-formulario" id="formulario" aria-label="Formulario de evaluación">
+    <div class="contenedor">
+      <div class="ev-formulario__barra">
+        <BarraAcciones aviso={e.avisoPrivacidad} imprimir={e.acciones.imprimir} limpiar={e.acciones.limpiar} />
+      </div>
+
+      <form
+        class="ev-documento"
+        autocomplete="off"
+        novalidate
+        data-evaluacion
+        data-niveles={JSON.stringify(e.escala.niveles)}
+        data-sin-notas={e.resumen.sinNotas}
+        data-confirmar-limpiar={e.acciones.confirmarLimpiar}
+      >
+        <FormatoCabecera titulo={e.titulo} cargo={e.cargo} lema={e.lema} />
+        <DatosGenerales {...e.datosGenerales} />
+
+        <div class="ev-para-que ev-evitar-corte">
+          <p><strong>{e.intro.paraQue.titulo}</strong> {e.intro.paraQue.texto}</p>
+        </div>
+
+        <EscalaCalificacion {...e.escala} />
+        {e.secciones.map((s) => <TablaCriterios seccion={s} escala={e.escala} sinNotas={e.resumen.sinNotas} />)}
+        <ResumenPromedios {...e.resumen} secciones={e.secciones} />
+        <BalanceGeneral {...e.balance} />
+        <PlanMejora {...e.planMejora} />
+        <ResultadoFinal {...e.resultado} />
+        <Firmas {...e.firmas} />
+      </form>
+
+      <div class="ev-formulario__barra ev-formulario__barra--final">
+        <BarraAcciones aviso={e.avisoPrivacidad} imprimir={e.acciones.imprimir} limpiar={e.acciones.limpiar} mostrarAviso={false} />
+      </div>
+    </div>
+  </section>
+</GenteLayout>
+
+<script>
+  import '../../scripts/evaluacion.js';
+</script>
+
+<style>
+  .ev-formulario__barra { max-width: 1080px; margin: 0 auto 1.5rem; }
+  .ev-formulario__barra--final { margin: 1.5rem auto 0; }
+  .ev-para-que {
+    margin-top: var(--evaluacion-espacio-seccion);
+    padding: 1rem 1.2rem;
+    border-radius: var(--radio);
+    background: var(--menta);
+    border-left: 4px solid var(--verde);
+    color: var(--texto);
+  }
+  .ev-para-que strong { color: var(--verde-oscuro); }
+  #formulario { scroll-margin-top: 150px; }
+
+  @media print {
+    .ev-para-que { padding: 2mm 3mm; margin-top: 4mm; font-size: 8.5pt; }
+  }
+</style>
